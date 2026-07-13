@@ -1,111 +1,178 @@
-import { DataTable } from '@/components/shared/data-table'
-import { StatusBadge } from '@/components/shared/status-badge'
-import { Button } from '@/components/ui/button'
-import { UsuarioForm } from '@/features/usuarios/components/usuario-form'
-import { getRolesDisponibles, getUsuarios } from '@/features/usuarios/services/usuario.service'
-import type { UserProfile } from '@/types/usuario'
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import type { ColumnDef } from '@tanstack/react-table'
-import { Plus } from 'lucide-react'
-import { useState } from 'react'
+import { Breadcrumbs } from '@/components/shared/breadcrumbs'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { supabase } from '@/lib/supabase'
+import { createFileRoute } from '@tanstack/react-router'
+import {
+  AlertCircle,
+  FileText,
+  Mail,
+  Package,
+  Users,
+  Wrench,
+  Zap
+} from 'lucide-react'
 
 export const Route = createFileRoute('/(admin)/dashboard')({
   loader: async () => {
-    const [usuarios, roles] = await Promise.all([
-      getUsuarios(),
-      getRolesDisponibles(),
+    // Obtener conteos reales de la base de datos
+    const [
+      usuariosResult,
+      productosResult,
+      categoriasResult,
+      serviciosResult,
+      contactosResult,
+      suscriptoresResult,
+    ] = await Promise.all([
+      supabase.from('perfiles').select('id', { count: 'exact', head: true }).neq('estado', 'eliminado'),
+      supabase.from('productos').select('id', { count: 'exact', head: true }),
+      supabase.from('categorias').select('id', { count: 'exact', head: true }),
+      supabase.from('servicios').select('id', { count: 'exact', head: true }),
+      supabase.from('contactos').select('id', { count: 'exact', head: true }),
+      supabase.from('suscriptores').select('id', { count: 'exact', head: true }),
     ])
-    return { usuarios, roles }
+
+    return {
+      stats: {
+        usuarios: usuariosResult.count || 0,
+        productos: productosResult.count || 0,
+        categorias: categoriasResult.count || 0,
+        servicios: serviciosResult.count || 0,
+        contactos: contactosResult.count || 0,
+        suscriptores: suscriptoresResult.count || 0,
+      },
+    }
   },
-  component: UsuariosPage,
+  component: Dashboard,
 })
 
-function UsuariosPage() {
-  const { usuarios, roles } = Route.useLoaderData()
-  const navigate = useNavigate()
-  const [isFormOpen, setIsFormOpen] = useState(false)
+function Dashboard() {
+  const { stats } = Route.useLoaderData()
 
-  const columns: ColumnDef<UserProfile>[] = [
+  const statsCards = [
     {
-      accessorKey: 'nombre_completo',
-      header: 'Nombre',
-      cell: ({ row }) => (
-        <div>
-          <div className="font-medium">{row.getValue('nombre_completo')}</div>
-          <div className="text-sm text-muted-foreground">{row.original.email}</div>
-        </div>
-      ),
+      title: 'Usuarios Activos',
+      value: stats.usuarios,
+      icon: Users,
+      description: 'Usuarios registrados en el sistema',
+      color: 'text-blue-600',
+      bgColor: 'bg-blue-50',
     },
     {
-      accessorKey: 'roles',
-      header: 'Roles',
-      cell: ({ row }) => (
-        <div className="flex flex-wrap gap-1">
-          {row.original.roles.map((role) => (
-            <span
-              key={role.id}
-              className="inline-flex items-center rounded-full bg-secondary px-2 py-1 text-xs font-medium text-secondary-foreground"
-            >
-              {role.nombre}
-            </span>
-          ))}
-        </div>
-      ),
+      title: 'Productos',
+      value: stats.productos,
+      icon: Package,
+      description: 'Productos en el catálogo',
+      color: 'text-green-600',
+      bgColor: 'bg-green-50',
     },
     {
-      accessorKey: 'estado',
-      header: 'Estado',
-      cell: ({ row }) => <StatusBadge status={row.getValue('estado')} />,
+      title: 'Categorías',
+      value: stats.categorias,
+      icon: FileText,
+      description: 'Categorías de productos',
+      color: 'text-purple-600',
+      bgColor: 'bg-purple-50',
     },
     {
-      id: 'actions',
-      header: 'Acciones',
-      cell: ({ row }) => (
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => {
-            // Aquí abriríamos el formulario en modo edición
-            console.log('Editar', row.original.id)
-          }}
-        >
-          Editar
-        </Button>
-      ),
+      title: 'Servicios',
+      value: stats.servicios,
+      icon: Wrench,
+      description: 'Servicios disponibles',
+      color: 'text-orange-600',
+      bgColor: 'bg-orange-50',
+    },
+    {
+      title: 'Contactos',
+      value: stats.contactos,
+      icon: Mail,
+      description: 'Mensajes de contacto',
+      color: 'text-pink-600',
+      bgColor: 'bg-pink-50',
+    },
+    {
+      title: 'Suscriptores',
+      value: stats.suscriptores,
+      icon: Zap,
+      description: 'Suscriptores al newsletter',
+      color: 'text-yellow-600',
+      bgColor: 'bg-yellow-50',
     },
   ]
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-3xl font-bold tracking-tight">Usuarios y Roles</h2>
-          <p className="text-muted-foreground">
-            Gestiona los usuarios del sistema y sus permisos de acceso.
-          </p>
-        </div>
-        <Button onClick={() => setIsFormOpen(true)}>
-          <Plus className="mr-2 h-4 w-4" />
-          Nuevo Usuario
-        </Button>
+      <Breadcrumbs
+        items={[
+          { label: 'Inicio' },
+          { label: 'Dashboard' },
+        ]}
+      />
+
+      <div>
+        <h2 className="text-3xl font-bold tracking-tight text-foreground">
+          Panel de Administración
+        </h2>
+        <p className="text-muted-foreground mt-2">
+          Resumen general del sistema Correas Center
+        </p>
       </div>
 
-      <DataTable
-        columns={columns}
-        data={usuarios}
-        searchKey="nombre_completo"
-        searchPlaceholder="Buscar por nombre o email..."
-      />
+      {/* Tarjetas de estadísticas */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {statsCards.map((stat) => {
+          const Icon = stat.icon
+          return (
+            <Card key={stat.title} className="hover:shadow-md transition-shadow">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  {stat.title}
+                </CardTitle>
+                <div className={`${stat.bgColor} p-2 rounded-lg`}>
+                  <Icon className={`h-5 w-5 ${stat.color}`} />
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{stat.value}</div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {stat.description}
+                </p>
+              </CardContent>
+            </Card>
+          )
+        })}
+      </div>
 
-      <UsuarioForm
-        open={isFormOpen}
-        onOpenChange={setIsFormOpen}
-        rolesDisponibles={roles}
-        onSuccess={() => {
-          setIsFormOpen(false)
-          navigate({ to: '/usuarios', replace: true }) // Recarga la ruta
-        }}
-      />
+      {/* Accesos rápidos */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Accesos Rápidos</CardTitle>
+          <CardDescription>
+            Módulos más utilizados del sistema
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            {[
+              { title: 'Gestionar Usuarios', href: '/usuarios', icon: Users },
+              { title: 'Ver Productos', href: '/productos', icon: Package },
+              { title: 'Contactos', href: '/contactos', icon: Mail },
+              { title: 'Auditoría', href: '/auditoria', icon: AlertCircle },
+            ].map((item) => {
+              const Icon = item.icon
+              return (
+                <a
+                  key={item.href}
+                  href={item.href}
+                  className="flex items-center gap-3 p-4 rounded-lg border hover:bg-muted/50 transition-colors"
+                >
+                  <Icon className="h-5 w-5 text-muted-foreground" />
+                  <span className="font-medium">{item.title}</span>
+                </a>
+              )
+            })}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   )
 }

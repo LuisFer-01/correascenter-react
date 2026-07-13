@@ -1,6 +1,6 @@
 import { AppSidebar } from '@/components/layout/app-sidebar'
 import { Header } from '@/components/layout/header'
-import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
+import { SidebarProvider } from '@/components/ui/sidebar'
 import { supabase } from '@/lib/supabase'
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 
@@ -17,15 +17,15 @@ export const Route = createFileRoute('/(admin)/_layout')({
 function LayoutComponent() {
   return (
     <SidebarProvider>
-      <AppSidebar />
-      <SidebarInset className="flex flex-col min-h-screen">
-        <Header />
-        <main className="flex-1 p-6 bg-muted/30">
-          <div className="max-w-7xl mx-auto">
+      <div className="flex min-h-screen w-full">
+        <AppSidebar />
+        <main className="flex-1 flex flex-col bg-muted/10">
+          <Header />
+          <div className="flex-1 p-6 overflow-auto">
             <Outlet />
           </div>
         </main>
-      </SidebarInset>
+      </div>
     </SidebarProvider>
   )
 }
