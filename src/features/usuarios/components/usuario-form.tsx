@@ -1,5 +1,5 @@
-import { ImageUpload } from '#/components/shared/image-upload'
 import { FormShell } from '@/components/shared/form-shell'
+import { ImageUpload } from '@/components/shared/image-upload'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -15,7 +15,6 @@ const formSchema = z.object({
   email: z.string().email('Email inválido'),
   password: z.string().min(6, 'La contraseña debe tener al menos 6 caracteres').optional().or(z.literal('')),
   telefono: z.string().optional(),
-  avatar_url: z.string().url('URL inválida').optional().or(z.literal('')),
   estado: z.enum(['activo', 'inactivo']),
   role_ids: z.array(z.number()).min(1, 'Debes seleccionar al menos un rol'),
 })
@@ -30,12 +29,12 @@ interface UsuarioFormProps {
   onSuccess: () => void
 }
 
-export function UsuarioForm({ 
-  open, 
-  onOpenChange, 
-  rolesDisponibles, 
+export function UsuarioForm({
+  open,
+  onOpenChange,
+  rolesDisponibles,
   usuarioEditar,
-  onSuccess 
+  onSuccess
 }: UsuarioFormProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [avatarUrl, setAvatarUrl] = useState<string>('')
@@ -48,7 +47,6 @@ export function UsuarioForm({
       email: '',
       password: '',
       telefono: '',
-      avatar_url: '',
       estado: 'activo',
       role_ids: [],
     },
@@ -56,33 +54,32 @@ export function UsuarioForm({
 
   useEffect(() => {
     if (usuarioEditar && open) {
-        setAvatarUrl(usuarioEditar.avatar_url || '')
-        const nombreReal = usuarioEditar.nombre_completo !== 'Sin Nombre para Mostrar' 
-            ? usuarioEditar.nombre_completo 
-            : ''
-        const emailReal = usuarioEditar.email !== 'Sin email' 
-            ? usuarioEditar.email 
-            : ''
+      setAvatarUrl(usuarioEditar.avatar_url || '')
+      const nombreReal = usuarioEditar.nombre_completo !== 'Sin Nombre para Mostrar'
+        ? usuarioEditar.nombre_completo
+        : ''
+      const emailReal = usuarioEditar.email !== 'Sin email'
+        ? usuarioEditar.email
+        : ''
 
-        form.reset({
-            nombre_completo: nombreReal,
-            email: emailReal,
-            password: '',
-            telefono: usuarioEditar.telefono || '',
-            avatar_url: usuarioEditar.avatar_url || '',
-            estado: usuarioEditar.estado === 'eliminado' ? 'activo' : usuarioEditar.estado,
-            role_ids: usuarioEditar.roles.map(r => r.id),
-        })
+      form.reset({
+        nombre_completo: nombreReal,
+        email: emailReal,
+        password: '',
+        telefono: usuarioEditar.telefono || '',
+        estado: usuarioEditar.estado === 'eliminado' ? 'activo' : usuarioEditar.estado,
+        role_ids: usuarioEditar.roles.map(r => r.id),
+      })
     } else if (!open) {
-        form.reset({
-            nombre_completo: '',
-            email: '',
-            password: '',
-            telefono: '',
-            avatar_url: '',
-            estado: 'activo',
-            role_ids: [],
-        })
+      form.reset({
+        nombre_completo: '',
+        email: '',
+        password: '',
+        telefono: '',
+        estado: 'activo',
+        role_ids: [],
+      })
+      setAvatarUrl('')
     }
   }, [usuarioEditar, open, form])
 
@@ -116,6 +113,7 @@ export function UsuarioForm({
         })
       }
       form.reset()
+      setAvatarUrl('')
       onSuccess()
     } catch (error: any) {
       console.error('Error:', error)
@@ -130,12 +128,13 @@ export function UsuarioForm({
       open={open}
       onOpenChange={onOpenChange}
       title={isEditing ? 'Editar Usuario' : 'Crear Nuevo Usuario'}
-      description={isEditing 
-        ? 'Modifica la información del usuario' 
+      description={isEditing
+        ? 'Modifica la información del usuario'
         : 'Completa la información para registrar un nuevo usuario en el sistema.'}
       onSubmit={form.handleSubmit(onSubmit)}
       onCancel={() => {
         form.reset()
+        setAvatarUrl('')
         onOpenChange(false)
       }}
       isLoading={isLoading}
@@ -144,6 +143,7 @@ export function UsuarioForm({
       <form id="usuario-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         {/* Upload de Avatar */}
         <div className="border-b pb-4">
+          <Label>Avatar del Usuario</Label>
           <ImageUpload
             value={avatarUrl}
             onChange={setAvatarUrl}
@@ -175,15 +175,6 @@ export function UsuarioForm({
         <div className="grid gap-2">
           <Label htmlFor="telefono">Teléfono</Label>
           <Input id="telefono" {...form.register('telefono')} placeholder="+591 7 1234567" />
-        </div>
-
-        {/* Avatar URL */}
-        <div className="grid gap-2">
-          <Label htmlFor="avatar_url">URL del Avatar</Label>
-          <Input id="avatar_url" {...form.register('avatar_url')} placeholder="https://ejemplo.com/avatar.jpg" />
-          {form.formState.errors.avatar_url && (
-            <span className="text-sm text-destructive">{form.formState.errors.avatar_url.message}</span>
-          )}
         </div>
 
         {/* Password (solo en creación) */}
