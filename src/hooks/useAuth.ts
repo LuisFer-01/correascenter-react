@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react';
 import type { User } from '../lib/supabase'; // ← IMPORTANTE: usar 'import type'
-import { supabase } from '../lib/supabase'
+import { supabase } from '../lib/supabase';
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null)

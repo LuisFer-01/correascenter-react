@@ -1,132 +1,111 @@
-import { FormShell } from '@/components/shared/form-shell'
+import { DataTable } from '@/components/shared/data-table'
 import { StatusBadge } from '@/components/shared/status-badge'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { useAuth } from '@/hooks/useAuth'
-import { createFileRoute } from '@tanstack/react-router'
+import { UsuarioForm } from '@/features/usuarios/components/usuario-form'
+import { getRolesDisponibles, getUsuarios } from '@/features/usuarios/services/usuario.service'
+import type { UserProfile } from '@/types/usuario'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import type { ColumnDef } from '@tanstack/react-table'
+import { Plus } from 'lucide-react'
 import { useState } from 'react'
 
 export const Route = createFileRoute('/(admin)/dashboard')({
-  component: Dashboard,
+  loader: async () => {
+    const [usuarios, roles] = await Promise.all([
+      getUsuarios(),
+      getRolesDisponibles(),
+    ])
+    return { usuarios, roles }
+  },
+  component: UsuariosPage,
 })
 
-function Dashboard() {
-  const { user } = useAuth()
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  
-  // Estado del formulario
-  const [formData, setFormData] = useState({
-    nombre: '',
-    email: '',
-    estado: 'activo' as 'activo' | 'inactivo',
-  })
+function UsuariosPage() {
+  const { usuarios, roles } = Route.useLoaderData()
+  const navigate = useNavigate()
+  const [isFormOpen, setIsFormOpen] = useState(false)
 
-  const handleOpenModal = () => {
-    setFormData({ nombre: '', email: '', estado: 'activo' })
-    setIsModalOpen(true)
-  }
-
-  const handleSubmit = async () => {
-    setIsLoading(true)
-    
-    // Simular llamada API
-    await new Promise(resolve => setTimeout(resolve, 1500))
-    
-    console.log('Datos guardados:', formData)
-    setIsLoading(false)
-    setIsModalOpen(false)
-  }
-
-  const handleCancel = () => {
-    setIsModalOpen(false)
-    setFormData({ nombre: '', email: '', estado: 'activo' })
-  }
+  const columns: ColumnDef<UserProfile>[] = [
+    {
+      accessorKey: 'nombre_completo',
+      header: 'Nombre',
+      cell: ({ row }) => (
+        <div>
+          <div className="font-medium">{row.getValue('nombre_completo')}</div>
+          <div className="text-sm text-muted-foreground">{row.original.email}</div>
+        </div>
+      ),
+    },
+    {
+      accessorKey: 'roles',
+      header: 'Roles',
+      cell: ({ row }) => (
+        <div className="flex flex-wrap gap-1">
+          {row.original.roles.map((role) => (
+            <span
+              key={role.id}
+              className="inline-flex items-center rounded-full bg-secondary px-2 py-1 text-xs font-medium text-secondary-foreground"
+            >
+              {role.nombre}
+            </span>
+          ))}
+        </div>
+      ),
+    },
+    {
+      accessorKey: 'estado',
+      header: 'Estado',
+      cell: ({ row }) => <StatusBadge status={row.getValue('estado')} />,
+    },
+    {
+      id: 'actions',
+      header: 'Acciones',
+      cell: ({ row }) => (
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => {
+            // Aquí abriríamos el formulario en modo edición
+            console.log('Editar', row.original.id)
+          }}
+        >
+          Editar
+        </Button>
+      ),
+    },
+  ]
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-3xl font-bold tracking-tight text-foreground">
-          ¡Bienvenido, {user?.user_metadata?.nombre_completo || 'Administrador'}!
-        </h2>
-        <p className="text-muted-foreground mt-2">
-          Aquí tienes un resumen general del sistema. Selecciona un módulo del menú lateral para comenzar.
-        </p>
-      </div>
-
-      {/* Botón para abrir el modal */}
-      <div className="flex gap-4">
-        <Button onClick={handleOpenModal}>
-          Agregar Registro
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-3xl font-bold tracking-tight">Usuarios y Roles</h2>
+          <p className="text-muted-foreground">
+            Gestiona los usuarios del sistema y sus permisos de acceso.
+          </p>
+        </div>
+        <Button onClick={() => setIsFormOpen(true)}>
+          <Plus className="mr-2 h-4 w-4" />
+          Nuevo Usuario
         </Button>
       </div>
 
-      {/* Ejemplo de StatusBadge */}
-      <div className="rounded-xl border bg-card p-6 shadow-sm">
-        <h3 className="font-semibold mb-4">Prueba de StatusBadge</h3>
-        <div className="flex gap-3">
-          <StatusBadge status="activo" />
-          <StatusBadge status="inactivo" />
-        </div>
-      </div>
+      <DataTable
+        columns={columns}
+        data={usuarios}
+        searchKey="nombre_completo"
+        searchPlaceholder="Buscar por nombre o email..."
+      />
 
-      {/* FormShell Modal */}
-      <FormShell
-        open={isModalOpen}
-        onOpenChange={setIsModalOpen}
-        title="Agregar Nuevo Registro"
-        description="Completa la información del nuevo registro"
-        onSubmit={handleSubmit}
-        onCancel={handleCancel}
-        isLoading={isLoading}
-        submitLabel="Guardar Registro"
-      >
-        <div className="grid gap-4 py-4">
-          <div className="grid gap-2">
-            <Label htmlFor="nombre">Nombre</Label>
-            <Input
-              id="nombre"
-              placeholder="Ingresa el nombre"
-              value={formData.nombre}
-              onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
-            />
-          </div>
-          
-          <div className="grid gap-2">
-            <Label htmlFor="email">Correo electrónico</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="ejemplo@correo.com"
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-            />
-          </div>
-
-          <div className="grid gap-2">
-            <Label>Estado</Label>
-            <div className="flex gap-2">
-              <Button
-                type="button"
-                variant={formData.estado === 'activo' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setFormData({ ...formData, estado: 'activo' })}
-              >
-                Activo
-              </Button>
-              <Button
-                type="button"
-                variant={formData.estado === 'inactivo' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setFormData({ ...formData, estado: 'inactivo' })}
-              >
-                Inactivo
-              </Button>
-            </div>
-          </div>
-        </div>
-      </FormShell>
+      <UsuarioForm
+        open={isFormOpen}
+        onOpenChange={setIsFormOpen}
+        rolesDisponibles={roles}
+        onSuccess={() => {
+          setIsFormOpen(false)
+          navigate({ to: '/usuarios', replace: true }) // Recarga la ruta
+        }}
+      />
     </div>
   )
 }
