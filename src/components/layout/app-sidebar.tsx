@@ -1,4 +1,4 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -32,6 +32,10 @@ import {
   Package,
   Users
 } from "lucide-react"
+
+interface AppSidebarProps {
+  empresa?: { nombre: string; logo: string | null }
+}
 
 const navMain = [
   {
@@ -71,6 +75,7 @@ const navMain = [
     title: "Gestión",
     icon: Users,
     items: [
+      { title: "Empresas", url: "/empresas" },
       { title: "Usuarios y Roles", url: "/usuarios" },
       { title: "Roles y Permisos", url: "/roles" },
       { title: "Auditoría de Roles", url: "/roles-auditoria" },
@@ -81,25 +86,29 @@ const navMain = [
   },
 ]
 
-export function AppSidebar() {
+interface AppSidebarProps {
+  empresa?: { nombre: string; logo: string | null }
+}
+
+export function AppSidebar({ empresa }: AppSidebarProps) {
   const { user, signOut } = useAuth()
   const router = useRouter()
 
   const handleLogout = async () => {
     await signOut()
     router.navigate({ to: "/login" })
-    window.location.href = "/login" 
+    window.location.href = "/login"
   }
-
-  // Obtener avatar de user_metadata o perfiles
-  const avatarUrl = user?.user_metadata?.avatar_url
 
   return (
     <Sidebar collapsible="icon">
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel className="text-lg font-bold text-primary">
-            Correas Center
+          <SidebarGroupLabel className="text-lg font-bold text-primary flex items-center gap-2">
+            {empresa?.logo && (
+              <img src={empresa.logo} alt="Logo" className="h-6 w-6 object-contain" />
+            )}
+            <span className="truncate">{empresa?.nombre || 'Correas Center'}</span>
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -137,7 +146,6 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
@@ -148,7 +156,6 @@ export function AppSidebar() {
                   className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                 >
                   <Avatar className="h-8 w-8 rounded-lg">
-                    <AvatarImage src={avatarUrl} />
                     <AvatarFallback className="rounded-lg bg-primary text-primary-foreground">
                       {user?.email?.charAt(0).toUpperCase() || "U"}
                     </AvatarFallback>
@@ -172,7 +179,6 @@ export function AppSidebar() {
                 <DropdownMenuLabel className="p-0 font-normal">
                   <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                     <Avatar className="h-8 w-8 rounded-lg">
-                      <AvatarImage src={avatarUrl} />
                       <AvatarFallback className="rounded-lg bg-primary text-primary-foreground">
                         {user?.email?.charAt(0).toUpperCase() || "U"}
                       </AvatarFallback>

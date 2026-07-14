@@ -4,21 +4,19 @@ import { supabase } from '@/lib/supabase'
 import { Upload, X } from 'lucide-react'
 import { useState } from 'react'
 
-interface ImageUploadProps {
+interface LogoUploadProps {
   value: string
   onChange: (value: string) => void
   onRemove: () => void
-  userName?: string
-  userEmail?: string
+  companyName?: string
 }
 
-export function ImageUpload({
+export function LogoUpload({
   value,
   onChange,
   onRemove,
-  userName,
-  userEmail,
-}: ImageUploadProps) {
+  companyName,
+}: LogoUploadProps) {
   const [isUploading, setIsUploading] = useState(false)
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -31,9 +29,9 @@ export function ImageUpload({
       return
     }
 
-    // Validar tamaño (máximo 2MB)
-    if (file.size > 2 * 1024 * 1024) {
-      alert('La imagen no debe superar los 2MB')
+    // Validar tamaño (máximo 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('La imagen no debe superar los 5MB')
       return
     }
 
@@ -43,11 +41,11 @@ export function ImageUpload({
       // Crear nombre de archivo único
       const fileExt = file.name.split('.').pop()
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`
-      const filePath = `${fileName}`
+      const filePath = `logos/${fileName}`
 
       // Subir a Supabase Storage
       const { error: uploadError } = await supabase.storage
-        .from('avatars')
+        .from('logos-empresas')
         .upload(filePath, file, {
           cacheControl: '3600',
           upsert: false,
@@ -59,13 +57,13 @@ export function ImageUpload({
 
       // Obtener URL pública
       const { data } = supabase.storage
-        .from('avatars')
+        .from('logos-empresas')
         .getPublicUrl(filePath)
 
       onChange(data.publicUrl)
     } catch (error: any) {
-      console.error('Error al subir imagen:', error)
-      alert(error.message || 'Error al subir la imagen')
+      console.error('Error al subir logo:', error)
+      alert(error.message || 'Error al subir el logo')
     } finally {
       setIsUploading(false)
     }
@@ -74,10 +72,10 @@ export function ImageUpload({
   return (
     <div className="flex items-center gap-4">
       <div className="relative">
-        <Avatar className="h-20 w-20">
-          <AvatarImage src={value} alt={userName || 'Avatar'} />
-          <AvatarFallback className="bg-primary text-primary-foreground text-2xl">
-            {userName?.charAt(0).toUpperCase() || userEmail?.charAt(0).toUpperCase() || 'U'}
+        <Avatar className="h-24 w-24 rounded-lg border bg-background">
+          <AvatarImage src={value} alt={companyName || 'Logo'} className="object-contain p-2" />
+          <AvatarFallback className="bg-primary text-primary-foreground text-2xl rounded-lg">
+            {companyName?.charAt(0).toUpperCase() || 'E'}
           </AvatarFallback>
         </Avatar>
         
@@ -95,7 +93,7 @@ export function ImageUpload({
       </div>
 
       <div className="flex-1">
-        <label htmlFor="avatar-upload">
+        <label htmlFor="logo-upload">
           <Button
             type="button"
             variant="outline"
@@ -105,12 +103,12 @@ export function ImageUpload({
           >
             <span>
               <Upload className="mr-2 h-4 w-4" />
-              {isUploading ? 'Subiendo...' : value ? 'Cambiar imagen' : 'Subir imagen'}
+              {isUploading ? 'Subiendo...' : value ? 'Cambiar logo' : 'Subir logo'}
             </span>
           </Button>
         </label>
         <input
-          id="avatar-upload"
+          id="logo-upload"
           type="file"
           accept="image/*"
           onChange={handleFileChange}
@@ -118,7 +116,7 @@ export function ImageUpload({
           className="hidden"
         />
         <p className="mt-2 text-xs text-muted-foreground">
-          PNG, JPG o GIF hasta 5MB
+          PNG, JPG, SVG o WEBP hasta 5MB
         </p>
       </div>
     </div>

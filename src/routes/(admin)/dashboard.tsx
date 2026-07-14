@@ -1,16 +1,22 @@
 import { Breadcrumbs } from '@/components/shared/breadcrumbs'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { supabase } from '@/lib/supabase'
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useRouter } from '@tanstack/react-router'
 import {
   AlertCircle,
+  Building2,
   FileText,
   Mail,
+  Moon,
   Package,
+  Sun,
   Users,
   Wrench,
   Zap
 } from 'lucide-react'
+import { useEffect, useState } from 'react'
 
 export const Route = createFileRoute('/(admin)/dashboard')({
   loader: async () => {
@@ -22,6 +28,7 @@ export const Route = createFileRoute('/(admin)/dashboard')({
       serviciosResult,
       contactosResult,
       suscriptoresResult,
+      empresasResult,
     ] = await Promise.all([
       supabase.from('perfiles').select('id', { count: 'exact', head: true }).neq('estado', 'eliminado'),
       supabase.from('productos').select('id', { count: 'exact', head: true }),
@@ -29,6 +36,7 @@ export const Route = createFileRoute('/(admin)/dashboard')({
       supabase.from('servicios').select('id', { count: 'exact', head: true }),
       supabase.from('contactos').select('id', { count: 'exact', head: true }),
       supabase.from('suscriptores').select('id', { count: 'exact', head: true }),
+      supabase.from('empresas').select('id, nombre, logo').eq('estado', 'activo').limit(1).single(),
     ])
 
     return {
@@ -40,13 +48,36 @@ export const Route = createFileRoute('/(admin)/dashboard')({
         contactos: contactosResult.count || 0,
         suscriptores: suscriptoresResult.count || 0,
       },
+      empresa: empresasResult.data || null,
     }
   },
   component: Dashboard,
 })
 
 function Dashboard() {
-  const { stats } = Route.useLoaderData()
+  const { stats, empresa } = Route.useLoaderData()
+  const router = useRouter()
+  const [isDarkMode, setIsDarkMode] = useState(false)
+
+  // Verificar modo oscuro al cargar
+  useEffect(() => {
+    const isDark = localStorage.getItem('darkMode') === 'true'
+    setIsDarkMode(isDark)
+    if (isDark) {
+      document.documentElement.classList.add('dark')
+    }
+  }, [])
+
+  const toggleDarkMode = () => {
+    const newDarkMode = !isDarkMode
+    setIsDarkMode(newDarkMode)
+    localStorage.setItem('darkMode', String(newDarkMode))
+    if (newDarkMode) {
+      document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+    }
+  }
 
   const statsCards = [
     {
@@ -99,80 +130,140 @@ function Dashboard() {
     },
   ]
 
+  const quickAccess = [
+    { title: 'Gestionar Usuarios', href: '/usuarios', icon: Users },
+    { title: 'Ver Productos', href: '/productos', icon: Package },
+    { title: 'Contactos', href: '/contactos', icon: Mail },
+    { title: 'Auditoría', href: '/auditoria', icon: AlertCircle },
+  ]
+
   return (
-    <div className="space-y-6">
-      <Breadcrumbs
-        items={[
-          { label: 'Inicio' },
-          { label: 'Dashboard' },
-        ]}
-      />
+    <div className="flex min-h-screen flex-col bg-background">
+      {/* Header del Admin */}
+      <header className="border-b bg-card px-6 py-4 flex justify-between items-center shadow-sm sticky top-0 z-50">
+        <div className="flex items-center gap-4">
+          {/* Logo de la Empresa */}
+          <div className="flex items-center gap-3">
+            {empresa?.logo ? (
+              <Avatar className="h-10 w-10 rounded-lg border">
+                <AvatarImage src={empresa.logo} alt={empresa.nombre} className="object-contain p-1" />
+                <AvatarFallback className="bg-primary text-primary-foreground rounded-lg">
+                  <Building2 className="h-5 w-5" />
+                </AvatarFallback>
+              </Avatar>
+            ) : (
+              <Avatar className="h-10 w-10 rounded-lg border bg-primary">
+                <AvatarFallback className="text-primary-foreground">
+                  <Building2 className="h-5 w-5" />
+                </AvatarFallback>
+              </Avatar>
+            )}
+            <div>
+              <h1 className="text-xl font-bold text-foreground">
+                {empresa?.nombre || 'Correas Center'}
+              </h1>
+              <p className="text-xs text-muted-foreground">Panel de Administración</p>
+            </div>
+          </div>
+        </div>
 
-      <div>
-        <h2 className="text-3xl font-bold tracking-tight text-foreground">
-          Panel de Administración
-        </h2>
-        <p className="text-muted-foreground mt-2">
-          Resumen general del sistema Correas Center
-        </p>
-      </div>
+        <div className="flex items-center gap-4">
+          {/* Toggle Dark Mode */}
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={toggleDarkMode}
+            title={isDarkMode ? 'Modo Claro' : 'Modo Oscuro'}
+          >
+            {isDarkMode ? (
+              <Sun className="h-5 w-5" />
+            ) : (
+              <Moon className="h-5 w-5" />
+            )}
+          </Button>
 
-      {/* Tarjetas de estadísticas */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {statsCards.map((stat) => {
-          const Icon = stat.icon
-          return (
-            <Card key={stat.title} className="hover:shadow-md transition-shadow">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  {stat.title}
-                </CardTitle>
-                <div className={`${stat.bgColor} p-2 rounded-lg`}>
-                  <Icon className={`h-5 w-5 ${stat.color}`} />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{stat.value}</div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {stat.description}
-                </p>
-              </CardContent>
-            </Card>
-          )
-        })}
-      </div>
+          {/* User Info */}
+          <div className="hidden md:flex items-center gap-2 text-sm text-muted-foreground">
+            <span>Admin</span>
+          </div>
+        </div>
+      </header>
 
-      {/* Accesos rápidos */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Accesos Rápidos</CardTitle>
-          <CardDescription>
-            Módulos más utilizados del sistema
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {[
-              { title: 'Gestionar Usuarios', href: '/usuarios', icon: Users },
-              { title: 'Ver Productos', href: '/productos', icon: Package },
-              { title: 'Contactos', href: '/contactos', icon: Mail },
-              { title: 'Auditoría', href: '/auditoria', icon: AlertCircle },
-            ].map((item) => {
-              const Icon = item.icon
+      {/* Contenido Principal */}
+      <main className="flex-1 p-6 md:p-8 bg-muted/30">
+        <div className="max-w-7xl mx-auto space-y-6">
+          {/* Breadcrumbs */}
+          <Breadcrumbs
+            items={[
+              { label: 'Inicio' },
+              { label: 'Dashboard' },
+            ]}
+          />
+
+          {/* Welcome Section */}
+          <div>
+            <h2 className="text-3xl font-bold tracking-tight text-foreground">
+              ¡Bienvenido al Panel de Administración!
+            </h2>
+            <p className="text-muted-foreground mt-2">
+              Resumen general del sistema Correas Center
+            </p>
+          </div>
+
+          {/* Tarjetas de estadísticas */}
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {statsCards.map((stat) => {
+              const Icon = stat.icon
               return (
-                <a
-                  key={item.href}
-                  href={item.href}
-                  className="flex items-center gap-3 p-4 rounded-lg border hover:bg-muted/50 transition-colors"
-                >
-                  <Icon className="h-5 w-5 text-muted-foreground" />
-                  <span className="font-medium">{item.title}</span>
-                </a>
+                <Card key={stat.title} className="hover:shadow-md transition-shadow">
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">
+                      {stat.title}
+                    </CardTitle>
+                    <div className={`${stat.bgColor} p-2 rounded-lg`}>
+                      <Icon className={`h-5 w-5 ${stat.color}`} />
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{stat.value}</div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {stat.description}
+                    </p>
+                  </CardContent>
+                </Card>
               )
             })}
           </div>
-        </CardContent>
-      </Card>
+
+          {/* Accesos rápidos */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Accesos Rápidos</CardTitle>
+              <CardDescription>
+                Módulos más utilizados del sistema
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                {quickAccess.map((item) => {
+                  const Icon = item.icon
+                  return (
+                    <Button
+                      key={item.href}
+                      variant="outline"
+                      className="flex flex-col items-start gap-3 p-4 h-auto hover:bg-muted/50 transition-colors justify-start"
+                      onClick={() => router.navigate({ to: item.href })}
+                    >
+                      <Icon className="h-5 w-5 text-muted-foreground" />
+                      <span className="font-medium">{item.title}</span>
+                    </Button>
+                  )
+                })}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </main>
     </div>
   )
 }

@@ -1,3 +1,5 @@
+import { AdminHeader } from '#/components/layout/admin-header'
+import { supabase } from '#/lib/supabase'
 import { Breadcrumbs } from '@/components/shared/breadcrumbs'
 import { DataTable } from '@/components/shared/data-table'
 import { DeleteConfirmation } from '@/components/shared/delete-confirmation'
@@ -6,9 +8,9 @@ import { StatusBadge } from '@/components/shared/status-badge'
 import { Button } from '@/components/ui/button'
 import { RolForm } from '@/features/roles/components/rol-form'
 import {
-    eliminarRol,
-    getPermisosAgrupados,
-    getRoles,
+  eliminarRol,
+  getPermisosAgrupados,
+  getRoles,
 } from '@/features/roles/services/rol.service'
 import { usePermissions } from '@/hooks/usePermissions'
 import type { Rol } from '@/types/rol'
@@ -19,17 +21,24 @@ import { useState } from 'react'
 
 export const Route = createFileRoute('/(admin)/roles')({
   loader: async () => {
-    const [roles, permisosAgrupados] = await Promise.all([
+    const [roles, permisosAgrupados, empresaResult] = await Promise.all([
       getRoles(true),
       getPermisosAgrupados(),
+      // Datos de la empresa (SIEMPRE incluir esto)
+      supabase
+        .from('empresas')
+        .select('id, nombre, logo')
+        .eq('estado', 'activo')
+        .limit(1)
+        .single(),
     ])
-    return { roles, permisosAgrupados }
+    return { roles, permisosAgrupados, empresa: empresaResult.data || null, }
   },
   component: RolesPage,
 })
 
 function RolesPage() {
-  const { roles, permisosAgrupados } = Route.useLoaderData()
+  const { roles, permisosAgrupados, empresa } = Route.useLoaderData()
   const navigate = useNavigate()
   const { hasPermission } = usePermissions()
 
@@ -185,65 +194,71 @@ function RolesPage() {
   ]
 
   return (
-    <div className="space-y-6">
-      <Breadcrumbs
-        items={[
-          { label: 'Gestión' },
-          { label: 'Roles y Permisos' },
-        ]}
-      />
+    <div className="flex min-h-screen flex-col bg-background">
+      {/* Header SIEMPRE con los datos de la empresa */}
+      <AdminHeader empresa={empresa} />
+      
+      {/* Contenido principal */}
+      <div className="max-w-7xl mx-auto space-y-6 p-6">
+        <Breadcrumbs
+          items={[
+            { label: 'Gestión' },
+            { label: 'Roles y Permisos' },
+          ]}
+        />
 
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-3xl font-bold tracking-tight">Roles y Permisos</h2>
-          <p className="text-muted-foreground">
-            Gestiona los roles del sistema y sus permisos de acceso.
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <RequirePermission permission="roles.manage">
-            <Button
-              variant={showDeleted ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setShowDeleted(!showDeleted)}
-            >
-              <Eye className="h-4 w-4 mr-2" />
-              {showDeleted ? 'Ocultar Eliminados' : 'Ver Eliminados'}
-            </Button>
-          </RequirePermission>
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-3xl font-bold tracking-tight">Roles y Permisos</h2>
+            <p className="text-muted-foreground">
+              Gestiona los roles del sistema y sus permisos de acceso.
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <RequirePermission permission="roles.manage">
+              <Button
+                variant={showDeleted ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setShowDeleted(!showDeleted)}
+              >
+                <Eye className="h-4 w-4 mr-2" />
+                {showDeleted ? 'Ocultar Eliminados' : 'Ver Eliminados'}
+              </Button>
+            </RequirePermission>
 
-          <RequirePermission permission="roles.manage">
-            <Button onClick={handleNuevoRol}>
-              <Plus className="mr-2 h-4 w-4" />
-              Nuevo Rol
-            </Button>
-          </RequirePermission>
+            <RequirePermission permission="roles.manage">
+              <Button onClick={handleNuevoRol}>
+                <Plus className="mr-2 h-4 w-4" />
+                Nuevo Rol
+              </Button>
+            </RequirePermission>
+          </div>
         </div>
+
+        <DataTable
+          columns={columns}
+          data={filteredRoles}
+          searchKey="nombre"
+          searchPlaceholder="Buscar por nombre o slug..."
+        />
+
+        <RolForm
+          open={isFormOpen}
+          onOpenChange={setIsFormOpen}
+          permisosAgrupados={permisosAgrupados}
+          rolEditar={rolEditar}
+          onSuccess={handleSuccess}
+        />
+
+        <DeleteConfirmation
+          open={isDeleteOpen}
+          onOpenChange={setIsDeleteOpen}
+          onConfirm={handleEliminarConfirm}
+          title="¿Eliminar este rol?"
+          description={`Se marcará como eliminado el rol "${rolEliminar?.nombre}". Los usuarios asignados a este rol perderán sus permisos.`}
+          isLoading={isDeleting}
+        />
       </div>
-
-      <DataTable
-        columns={columns}
-        data={filteredRoles}
-        searchKey="nombre"
-        searchPlaceholder="Buscar por nombre o slug..."
-      />
-
-      <RolForm
-        open={isFormOpen}
-        onOpenChange={setIsFormOpen}
-        permisosAgrupados={permisosAgrupados}
-        rolEditar={rolEditar}
-        onSuccess={handleSuccess}
-      />
-
-      <DeleteConfirmation
-        open={isDeleteOpen}
-        onOpenChange={setIsDeleteOpen}
-        onConfirm={handleEliminarConfirm}
-        title="¿Eliminar este rol?"
-        description={`Se marcará como eliminado el rol "${rolEliminar?.nombre}". Los usuarios asignados a este rol perderán sus permisos.`}
-        isLoading={isDeleting}
-      />
     </div>
   )
 }

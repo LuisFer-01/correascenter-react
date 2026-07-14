@@ -1,3 +1,5 @@
+import { AdminHeader } from '#/components/layout/admin-header'
+import { supabase } from '#/lib/supabase'
 import { Breadcrumbs } from '@/components/shared/breadcrumbs'
 import { DataTable } from '@/components/shared/data-table'
 import { DeleteConfirmation } from '@/components/shared/delete-confirmation'
@@ -21,17 +23,24 @@ import { useState } from 'react'
 
 export const Route = createFileRoute('/(admin)/usuarios')({
   loader: async () => {
-    const [usuarios, roles] = await Promise.all([
+    const [usuarios, roles, empresaResult] = await Promise.all([
       getUsuarios(true), // Incluir eliminados
       getRolesDisponibles(),
+      supabase
+        .from('empresas')
+        .select('id, nombre, logo')
+        .eq('estado', 'activo')
+        .limit(1)
+        .single(),
     ])
-    return { usuarios, roles }
+    return { usuarios, roles, // Datos de la empresa (SIEMPRE incluir)
+      empresa: empresaResult.data || null, }
   },
   component: UsuariosPage,
 })
 
 function UsuariosPage() {
-  const { usuarios, roles } = Route.useLoaderData()
+  const { usuarios, roles, empresa} = Route.useLoaderData()
   const navigate = useNavigate()
   const { hasPermission } = usePermissions()
   
@@ -191,66 +200,72 @@ function UsuariosPage() {
   ]
 
   return (
-    <div className="space-y-6">
-      <Breadcrumbs
-        items={[
-          { label: 'Gestión' },
-          { label: 'Usuarios y Roles' },
-        ]}
-      />
+    <div className="flex min-h-screen flex-col bg-background">
+      {/* Header SIEMPRE con los datos de la empresa */}
+      <AdminHeader empresa={empresa} />
+      
+      {/* Contenido principal */}
+      <div className="max-w-7xl mx-auto space-y-6 p-6">
+        <Breadcrumbs
+          items={[
+            { label: 'Gestión' },
+            { label: 'Usuarios y Roles' },
+          ]}
+        />
 
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-3xl font-bold tracking-tight">Usuarios y Roles</h2>
-          <p className="text-muted-foreground">
-            Gestiona los usuarios del sistema y sus permisos de acceso.
-          </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-3xl font-bold tracking-tight">Usuarios y Roles</h2>
+            <p className="text-muted-foreground">
+              Gestiona los usuarios del sistema y sus permisos de acceso.
+            </p>
+          </div>
+          <div className="flex gap-2">
+            {/* Botón para ver eliminados - Solo si tiene permiso */}
+            <RequirePermission permission="usuarios.view_deleted">
+              <Button 
+                variant={showDeleted ? "default" : "outline"} 
+                size="sm"
+                onClick={() => setShowDeleted(!showDeleted)}
+              >
+                <Eye className="h-4 w-4 mr-2" />
+                {showDeleted ? 'Ocultar Eliminados' : 'Ver Eliminados'}
+              </Button>
+            </RequirePermission>
+            
+            <RequirePermission permission="usuarios.create">
+              <Button onClick={handleNuevoUsuario}>
+                <Plus className="mr-2 h-4 w-4" />
+                Nuevo Usuario
+              </Button>
+            </RequirePermission>
+          </div>
         </div>
-        <div className="flex gap-2">
-          {/* Botón para ver eliminados - Solo si tiene permiso */}
-          <RequirePermission permission="usuarios.view_deleted">
-            <Button 
-              variant={showDeleted ? "default" : "outline"} 
-              size="sm"
-              onClick={() => setShowDeleted(!showDeleted)}
-            >
-              <Eye className="h-4 w-4 mr-2" />
-              {showDeleted ? 'Ocultar Eliminados' : 'Ver Eliminados'}
-            </Button>
-          </RequirePermission>
-          
-          <RequirePermission permission="usuarios.create">
-            <Button onClick={handleNuevoUsuario}>
-              <Plus className="mr-2 h-4 w-4" />
-              Nuevo Usuario
-            </Button>
-          </RequirePermission>
-        </div>
+
+        <DataTable
+          columns={columns}
+          data={filteredUsers}
+          searchKey="nombre_completo"
+          searchPlaceholder="Buscar por nombre, email o teléfono..."
+        />
+
+        <UsuarioForm
+          open={isFormOpen}
+          onOpenChange={setIsFormOpen}
+          rolesDisponibles={roles}
+          usuarioEditar={usuarioEditar}
+          onSuccess={handleSuccess}
+        />
+
+        <DeleteConfirmation
+          open={isDeleteOpen}
+          onOpenChange={setIsDeleteOpen}
+          onConfirm={handleEliminarConfirm}
+          title="¿Eliminar este usuario?"
+          description={`Se marcará como eliminado a "${usuarioEliminar?.nombre_completo}". El registro se mantendrá en la base de datos para auditoría.`}
+          isLoading={isDeleting}
+        />
       </div>
-
-      <DataTable
-        columns={columns}
-        data={filteredUsers}
-        searchKey="nombre_completo"
-        searchPlaceholder="Buscar por nombre, email o teléfono..."
-      />
-
-      <UsuarioForm
-        open={isFormOpen}
-        onOpenChange={setIsFormOpen}
-        rolesDisponibles={roles}
-        usuarioEditar={usuarioEditar}
-        onSuccess={handleSuccess}
-      />
-
-      <DeleteConfirmation
-        open={isDeleteOpen}
-        onOpenChange={setIsDeleteOpen}
-        onConfirm={handleEliminarConfirm}
-        title="¿Eliminar este usuario?"
-        description={`Se marcará como eliminado a "${usuarioEliminar?.nombre_completo}". El registro se mantendrá en la base de datos para auditoría.`}
-        isLoading={isDeleting}
-      />
     </div>
   )
 }

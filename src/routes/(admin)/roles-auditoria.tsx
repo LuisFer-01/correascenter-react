@@ -1,3 +1,5 @@
+import { supabase } from '#/lib/supabase'
+import { AdminHeader } from '@/components/layout/admin-header'
 import { Breadcrumbs } from '@/components/shared/breadcrumbs'
 import { DataTable } from '@/components/shared/data-table'
 import { Badge } from '@/components/ui/badge'
@@ -16,7 +18,6 @@ import { FileText, History, User } from 'lucide-react'
 import { useState } from 'react'
 import { z } from 'zod'
 
-// Schema corregido con valores en español (coinciden con ENUM de BD)
 const searchSchema = z.object({
   accion: z.enum(['crear', 'actualizar', 'eliminar']).optional().catch(undefined),
   page: z.number().int().positive().default(1).catch(1),
@@ -34,18 +35,28 @@ export const Route = createFileRoute('/(admin)/roles-auditoria')({
       offset: (search.page - 1) * 20,
     }
 
-    try {
-      return await getAuditoriaRoles(filters)
-    } catch (error) {
-      console.error('Error cargando auditoría:', error)
-      return { logs: [], total: 0 }
+    // Obtener datos de la empresa Y auditoría en paralelo
+    const [auditoriaResult, empresaResult] = await Promise.all([
+      getAuditoriaRoles(filters),
+      supabase
+        .from('empresas')
+        .select('id, nombre, logo')
+        .eq('estado', 'activo')
+        .limit(1)
+        .single(),
+    ])
+
+    return {
+      logs: auditoriaResult.logs,
+      total: auditoriaResult.total,
+      empresa: empresaResult.data || null,
     }
   },
   component: RolesAuditoriaPage,
 })
 
 function RolesAuditoriaPage() {
-  const { logs, total } = Route.useLoaderData()
+  const { logs, total, empresa } = Route.useLoaderData()
   const search = Route.useSearch()
   const navigate = useNavigate()
   const [accionFilter, setAccionFilter] = useState<string>(search.accion || 'all')
@@ -184,48 +195,51 @@ function RolesAuditoriaPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <Breadcrumbs
-        items={[
-          { label: 'Gestión', href: '/roles' },
-          { label: 'Auditoría de Roles' },
-        ]}
-      />
+    <div className="flex min-h-screen flex-col bg-background">
+      <AdminHeader empresa={empresa} />
+      
+      <div className="max-w-7xl mx-auto space-y-6 p-6">
+        <Breadcrumbs
+          items={[
+            { label: 'Gestión', href: '/roles' },
+            { label: 'Auditoría de Roles' },
+          ]}
+        />
 
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-3xl font-bold tracking-tight flex items-center gap-2">
-            <History className="h-7 w-7" />
-            Auditoría de Roles
-          </h2>
-          <p className="text-muted-foreground">
-            Historial de cambios en roles y permisos
-          </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-3xl font-bold tracking-tight flex items-center gap-2">
+              <History className="h-7 w-7" />
+              Auditoría de Roles
+            </h2>
+            <p className="text-muted-foreground">
+              Historial de cambios en roles y permisos
+            </p>
+          </div>
+          <Select value={accionFilter} onValueChange={handleFilterChange}>
+            <SelectTrigger className="w-[200px]">
+              <SelectValue placeholder="Filtrar por acción" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todas las acciones</SelectItem>
+              <SelectItem value="crear">Creaciones</SelectItem>
+              <SelectItem value="actualizar">Modificaciones</SelectItem>
+              <SelectItem value="eliminar">Eliminaciones</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
-        <Select value={accionFilter} onValueChange={handleFilterChange}>
-          <SelectTrigger className="w-[200px]">
-            <SelectValue placeholder="Filtrar por acción" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Todas las acciones</SelectItem>
-            <SelectItem value="crear">Creaciones</SelectItem>
-            <SelectItem value="actualizar">Modificaciones</SelectItem>
-            <SelectItem value="eliminar">Eliminaciones</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+        <DataTable
+          columns={columns}
+          data={logs}
+          searchKey="registro_id"
+          searchPlaceholder="Buscar por ID de rol..."
+          pageSize={20}
+        />
 
-      <DataTable
-        columns={columns}
-        data={logs}
-        searchKey="registro_id"
-        searchPlaceholder="Buscar por ID de rol..."
-        pageSize={20}
-      />
-
-      <div className="text-sm text-muted-foreground text-center">
-        Total de registros: {total}
+        <div className="text-sm text-muted-foreground text-center">
+          Total de registros: {total}
+        </div>
       </div>
     </div>
   )

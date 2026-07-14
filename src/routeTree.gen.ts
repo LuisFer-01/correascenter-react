@@ -14,6 +14,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as adminUsuariosRouteImport } from './routes/(admin)/usuarios'
 import { Route as adminRolesAuditoriaRouteImport } from './routes/(admin)/roles-auditoria'
 import { Route as adminRolesRouteImport } from './routes/(admin)/roles'
+import { Route as adminEmpresasRouteImport } from './routes/(admin)/empresas'
 import { Route as adminDashboardRouteImport } from './routes/(admin)/dashboard'
 import { Route as adminLayoutRouteImport } from './routes/(admin)/_layout'
 
@@ -42,6 +43,11 @@ const adminRolesRoute = adminRolesRouteImport.update({
   path: '/roles',
   getParentRoute: () => rootRouteImport,
 } as any)
+const adminEmpresasRoute = adminEmpresasRouteImport.update({
+  id: '/(admin)/empresas',
+  path: '/empresas',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const adminDashboardRoute = adminDashboardRouteImport.update({
   id: '/(admin)/dashboard',
   path: '/dashboard',
@@ -56,6 +62,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/dashboard': typeof adminDashboardRoute
+  '/empresas': typeof adminEmpresasRoute
   '/roles': typeof adminRolesRoute
   '/roles-auditoria': typeof adminRolesAuditoriaRoute
   '/usuarios': typeof adminUsuariosRoute
@@ -64,6 +71,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/dashboard': typeof adminDashboardRoute
+  '/empresas': typeof adminEmpresasRoute
   '/roles': typeof adminRolesRoute
   '/roles-auditoria': typeof adminRolesAuditoriaRoute
   '/usuarios': typeof adminUsuariosRoute
@@ -74,6 +82,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/(admin)/_layout': typeof adminLayoutRoute
   '/(admin)/dashboard': typeof adminDashboardRoute
+  '/(admin)/empresas': typeof adminEmpresasRoute
   '/(admin)/roles': typeof adminRolesRoute
   '/(admin)/roles-auditoria': typeof adminRolesAuditoriaRoute
   '/(admin)/usuarios': typeof adminUsuariosRoute
@@ -81,16 +90,29 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/login' | '/dashboard' | '/roles' | '/roles-auditoria' | '/usuarios'
+    | '/'
+    | '/login'
+    | '/dashboard'
+    | '/empresas'
+    | '/roles'
+    | '/roles-auditoria'
+    | '/usuarios'
   fileRoutesByTo: FileRoutesByTo
   to:
-    '/' | '/login' | '/dashboard' | '/roles' | '/roles-auditoria' | '/usuarios'
+    | '/'
+    | '/login'
+    | '/dashboard'
+    | '/empresas'
+    | '/roles'
+    | '/roles-auditoria'
+    | '/usuarios'
   id:
     | '__root__'
     | '/'
     | '/login'
     | '/(admin)/_layout'
     | '/(admin)/dashboard'
+    | '/(admin)/empresas'
     | '/(admin)/roles'
     | '/(admin)/roles-auditoria'
     | '/(admin)/usuarios'
@@ -101,6 +123,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   adminLayoutRoute: typeof adminLayoutRoute
   adminDashboardRoute: typeof adminDashboardRoute
+  adminEmpresasRoute: typeof adminEmpresasRoute
   adminRolesRoute: typeof adminRolesRoute
   adminRolesAuditoriaRoute: typeof adminRolesAuditoriaRoute
   adminUsuariosRoute: typeof adminUsuariosRoute
@@ -143,6 +166,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof adminRolesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/(admin)/empresas': {
+      id: '/(admin)/empresas'
+      path: '/empresas'
+      fullPath: '/empresas'
+      preLoaderRoute: typeof adminEmpresasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/(admin)/dashboard': {
       id: '/(admin)/dashboard'
       path: '/dashboard'
@@ -165,6 +195,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   adminLayoutRoute: adminLayoutRoute,
   adminDashboardRoute: adminDashboardRoute,
+  adminEmpresasRoute: adminEmpresasRoute,
   adminRolesRoute: adminRolesRoute,
   adminRolesAuditoriaRoute: adminRolesAuditoriaRoute,
   adminUsuariosRoute: adminUsuariosRoute,
