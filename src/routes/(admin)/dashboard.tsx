@@ -1,22 +1,18 @@
+import { AdminHeader } from '#/components/layout/admin-header'
 import { Breadcrumbs } from '@/components/shared/breadcrumbs'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { supabase } from '@/lib/supabase'
 import { createFileRoute, useRouter } from '@tanstack/react-router'
 import {
   AlertCircle,
-  Building2,
   FileText,
   Mail,
-  Moon,
   Package,
-  Sun,
   Users,
   Wrench,
   Zap
 } from 'lucide-react'
-import { useEffect, useState } from 'react'
 
 export const Route = createFileRoute('/(admin)/dashboard')({
   loader: async () => {
@@ -28,7 +24,7 @@ export const Route = createFileRoute('/(admin)/dashboard')({
       serviciosResult,
       contactosResult,
       suscriptoresResult,
-      empresasResult,
+      empresaResult,
     ] = await Promise.all([
       supabase.from('perfiles').select('id', { count: 'exact', head: true }).neq('estado', 'eliminado'),
       supabase.from('productos').select('id', { count: 'exact', head: true }),
@@ -48,7 +44,7 @@ export const Route = createFileRoute('/(admin)/dashboard')({
         contactos: contactosResult.count || 0,
         suscriptores: suscriptoresResult.count || 0,
       },
-      empresa: empresasResult.data || null,
+      empresa: empresaResult.data || null
     }
   },
   component: Dashboard,
@@ -57,27 +53,6 @@ export const Route = createFileRoute('/(admin)/dashboard')({
 function Dashboard() {
   const { stats, empresa } = Route.useLoaderData()
   const router = useRouter()
-  const [isDarkMode, setIsDarkMode] = useState(false)
-
-  // Verificar modo oscuro al cargar
-  useEffect(() => {
-    const isDark = localStorage.getItem('darkMode') === 'true'
-    setIsDarkMode(isDark)
-    if (isDark) {
-      document.documentElement.classList.add('dark')
-    }
-  }, [])
-
-  const toggleDarkMode = () => {
-    const newDarkMode = !isDarkMode
-    setIsDarkMode(newDarkMode)
-    localStorage.setItem('darkMode', String(newDarkMode))
-    if (newDarkMode) {
-      document.documentElement.classList.add('dark')
-    } else {
-      document.documentElement.classList.remove('dark')
-    }
-  }
 
   const statsCards = [
     {
@@ -140,54 +115,7 @@ function Dashboard() {
   return (
     <div className="flex min-h-screen flex-col bg-background">
       {/* Header del Admin */}
-      <header className="border-b bg-card px-6 py-4 flex justify-between items-center shadow-sm sticky top-0 z-50">
-        <div className="flex items-center gap-4">
-          {/* Logo de la Empresa */}
-          <div className="flex items-center gap-3">
-            {empresa?.logo ? (
-              <Avatar className="h-10 w-10 rounded-lg border">
-                <AvatarImage src={empresa.logo} alt={empresa.nombre} className="object-contain p-1" />
-                <AvatarFallback className="bg-primary text-primary-foreground rounded-lg">
-                  <Building2 className="h-5 w-5" />
-                </AvatarFallback>
-              </Avatar>
-            ) : (
-              <Avatar className="h-10 w-10 rounded-lg border bg-primary">
-                <AvatarFallback className="text-primary-foreground">
-                  <Building2 className="h-5 w-5" />
-                </AvatarFallback>
-              </Avatar>
-            )}
-            <div>
-              <h1 className="text-xl font-bold text-foreground">
-                {empresa?.nombre || 'Correas Center'}
-              </h1>
-              <p className="text-xs text-muted-foreground">Panel de Administración</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-4">
-          {/* Toggle Dark Mode */}
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={toggleDarkMode}
-            title={isDarkMode ? 'Modo Claro' : 'Modo Oscuro'}
-          >
-            {isDarkMode ? (
-              <Sun className="h-5 w-5" />
-            ) : (
-              <Moon className="h-5 w-5" />
-            )}
-          </Button>
-
-          {/* User Info */}
-          <div className="hidden md:flex items-center gap-2 text-sm text-muted-foreground">
-            <span>Admin</span>
-          </div>
-        </div>
-      </header>
+      <AdminHeader empresa={empresa} />
 
       {/* Contenido Principal */}
       <main className="flex-1 p-6 md:p-8 bg-muted/30">

@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as adminUsuariosRouteImport } from './routes/(admin)/usuarios'
+import { Route as adminSucursalesRouteImport } from './routes/(admin)/sucursales'
 import { Route as adminRolesAuditoriaRouteImport } from './routes/(admin)/roles-auditoria'
 import { Route as adminRolesRouteImport } from './routes/(admin)/roles'
 import { Route as adminEmpresasRouteImport } from './routes/(admin)/empresas'
@@ -31,6 +32,11 @@ const IndexRoute = IndexRouteImport.update({
 const adminUsuariosRoute = adminUsuariosRouteImport.update({
   id: '/(admin)/usuarios',
   path: '/usuarios',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const adminSucursalesRoute = adminSucursalesRouteImport.update({
+  id: '/(admin)/sucursales',
+  path: '/sucursales',
   getParentRoute: () => rootRouteImport,
 } as any)
 const adminRolesAuditoriaRoute = adminRolesAuditoriaRouteImport.update({
@@ -65,6 +71,7 @@ export interface FileRoutesByFullPath {
   '/empresas': typeof adminEmpresasRoute
   '/roles': typeof adminRolesRoute
   '/roles-auditoria': typeof adminRolesAuditoriaRoute
+  '/sucursales': typeof adminSucursalesRoute
   '/usuarios': typeof adminUsuariosRoute
 }
 export interface FileRoutesByTo {
@@ -74,6 +81,7 @@ export interface FileRoutesByTo {
   '/empresas': typeof adminEmpresasRoute
   '/roles': typeof adminRolesRoute
   '/roles-auditoria': typeof adminRolesAuditoriaRoute
+  '/sucursales': typeof adminSucursalesRoute
   '/usuarios': typeof adminUsuariosRoute
 }
 export interface FileRoutesById {
@@ -85,6 +93,7 @@ export interface FileRoutesById {
   '/(admin)/empresas': typeof adminEmpresasRoute
   '/(admin)/roles': typeof adminRolesRoute
   '/(admin)/roles-auditoria': typeof adminRolesAuditoriaRoute
+  '/(admin)/sucursales': typeof adminSucursalesRoute
   '/(admin)/usuarios': typeof adminUsuariosRoute
 }
 export interface FileRouteTypes {
@@ -96,6 +105,7 @@ export interface FileRouteTypes {
     | '/empresas'
     | '/roles'
     | '/roles-auditoria'
+    | '/sucursales'
     | '/usuarios'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -105,6 +115,7 @@ export interface FileRouteTypes {
     | '/empresas'
     | '/roles'
     | '/roles-auditoria'
+    | '/sucursales'
     | '/usuarios'
   id:
     | '__root__'
@@ -115,6 +126,7 @@ export interface FileRouteTypes {
     | '/(admin)/empresas'
     | '/(admin)/roles'
     | '/(admin)/roles-auditoria'
+    | '/(admin)/sucursales'
     | '/(admin)/usuarios'
   fileRoutesById: FileRoutesById
 }
@@ -126,6 +138,7 @@ export interface RootRouteChildren {
   adminEmpresasRoute: typeof adminEmpresasRoute
   adminRolesRoute: typeof adminRolesRoute
   adminRolesAuditoriaRoute: typeof adminRolesAuditoriaRoute
+  adminSucursalesRoute: typeof adminSucursalesRoute
   adminUsuariosRoute: typeof adminUsuariosRoute
 }
 
@@ -150,6 +163,13 @@ declare module '@tanstack/react-router' {
       path: '/usuarios'
       fullPath: '/usuarios'
       preLoaderRoute: typeof adminUsuariosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(admin)/sucursales': {
+      id: '/(admin)/sucursales'
+      path: '/sucursales'
+      fullPath: '/sucursales'
+      preLoaderRoute: typeof adminSucursalesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/(admin)/roles-auditoria': {
@@ -198,6 +218,7 @@ const rootRouteChildren: RootRouteChildren = {
   adminEmpresasRoute: adminEmpresasRoute,
   adminRolesRoute: adminRolesRoute,
   adminRolesAuditoriaRoute: adminRolesAuditoriaRoute,
+  adminSucursalesRoute: adminSucursalesRoute,
   adminUsuariosRoute: adminUsuariosRoute,
 }
 export const routeTree = rootRouteImport

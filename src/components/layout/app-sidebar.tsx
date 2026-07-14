@@ -76,6 +76,7 @@ const navMain = [
     icon: Users,
     items: [
       { title: "Empresas", url: "/empresas" },
+      { title: "Sucursales", url: "/sucursales" },
       { title: "Usuarios y Roles", url: "/usuarios" },
       { title: "Roles y Permisos", url: "/roles" },
       { title: "Auditoría de Roles", url: "/roles-auditoria" },

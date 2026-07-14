@@ -38,10 +38,10 @@ export function AdminHeader({ empresa }: AdminHeaderProps) {
         {/* Logo de la Empresa */}
         <div className="flex items-center gap-3">
           {empresa?.logo ? (
-            <Avatar className="h-10 w-10 rounded-lg border">
+            <Avatar className="h-20 w-20 rounded-lg border">
               <AvatarImage src={empresa.logo} alt={empresa.nombre} className="object-contain p-1" />
               <AvatarFallback className="bg-primary text-primary-foreground rounded-lg">
-                <Building2 className="h-5 w-5" />
+                <Building2 className="h-20 w-20" />
               </AvatarFallback>
             </Avatar>
           ) : (

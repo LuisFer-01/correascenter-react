@@ -1,6 +1,8 @@
+import { AdminHeader } from '@/components/layout/admin-header'
 import { Breadcrumbs } from '@/components/shared/breadcrumbs'
 import { DataTable } from '@/components/shared/data-table'
 import { DeleteConfirmation } from '@/components/shared/delete-confirmation'
+import { RequirePermission } from '@/components/shared/require-permission'
 import { StatusBadge } from '@/components/shared/status-badge'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
@@ -8,38 +10,39 @@ import { EmpresaForm } from '@/features/empresas/components/empresa-form'
 import {
   eliminarEmpresa,
   getEmpresas,
+  restaurarEmpresa,
 } from '@/features/empresas/services/empresa.service'
+import { usePermissions } from '@/hooks/usePermissions'
 import { supabase } from '@/lib/supabase'
 import type { Empresa } from '@/types/empresa'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import type { ColumnDef } from '@tanstack/react-table'
-import { Building2, Moon, Pencil, Plus, Sun, Trash2 } from 'lucide-react'
+import { Building2, Eye, Pencil, Plus, RotateCcw, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 
 export const Route = createFileRoute('/(admin)/empresas')({
   loader: async () => {
-    const empresas = await getEmpresas(true)
-    const empresasresult = await Promise.all([supabase.from('empresas').select('id, nombre, logo').eq('estado', 'activo').limit(1).single()])
-    return { empresas, empresa: empresasresult.data || null }
+    const [empresas, empresaResult] = await Promise.all([
+      getEmpresas(true), // Incluir eliminados
+      supabase
+        .from('empresas')
+        .select('id, nombre, logo')
+        .eq('estado', 'activo')
+        .limit(1)
+        .single(),
+    ])
+    return {
+      empresas,
+      empresa: empresaResult.data || null,
+    }
   },
   component: EmpresasPage,
 })
 
 function EmpresasPage() {
-  const [isDarkMode, setIsDarkMode] = useState(false)
-  const { empresa } = Route.useLoaderData()
-  const toggleDarkMode = () => {
-    const newDarkMode = !isDarkMode
-    setIsDarkMode(newDarkMode)
-    localStorage.setItem('darkMode', String(newDarkMode))
-    if (newDarkMode) {
-      document.documentElement.classList.add('dark')
-    } else {
-      document.documentElement.classList.remove('dark')
-    }
-  }
-  const { empresas } = Route.useLoaderData()
+  const { empresas, empresa } = Route.useLoaderData()
   const navigate = useNavigate()
+  const { hasPermission } = usePermissions()
 
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [empresaEditar, setEmpresaEditar] = useState<Empresa | null>(null)
@@ -47,6 +50,17 @@ function EmpresasPage() {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false)
   const [empresaEliminar, setEmpresaEliminar] = useState<Empresa | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
+
+  const [showDeleted, setShowDeleted] = useState(false)
+
+  // Filtrar empresas según permisos
+  const filteredEmpresas = empresas.filter((e: Empresa) => {
+    if (e.estado === 'eliminado') {
+      // Solo mostrar eliminados si tiene el permiso
+      return showDeleted && hasPermission('empresas.view_deleted')
+    }
+    return true
+  })
 
   const handleNuevaEmpresa = () => {
     setEmpresaEditar(null)
@@ -78,6 +92,15 @@ function EmpresasPage() {
     }
   }
 
+  const handleRestaurar = async (empresa: Empresa) => {
+    try {
+      await restaurarEmpresa(empresa.id)
+      navigate({ to: '/empresas', replace: true })
+    } catch (error: any) {
+      alert(error.message || 'Error al restaurar la empresa')
+    }
+  }
+
   const handleSuccess = () => {
     setIsFormOpen(false)
     setEmpresaEditar(null)
@@ -96,7 +119,7 @@ function EmpresasPage() {
             className="object-contain p-1"
           />
           <AvatarFallback className="bg-primary text-primary-foreground rounded-lg">
-            {row.original.nombre.charAt(0).toUpperCase()}
+            <Building2 className="h-5 w-5" />
           </AvatarFallback>
         </Avatar>
       ),
@@ -127,25 +150,46 @@ function EmpresasPage() {
       header: 'Acciones',
       cell: ({ row }) => {
         const empresa = row.original
+        
+        if (empresa.estado === 'eliminado') {
+          return (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleRestaurar(empresa)}
+            >
+              <RotateCcw className="h-4 w-4 mr-2" />
+              Restaurar
+            </Button>
+          )
+        }
+
         return (
           <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => handleEditarEmpresa(empresa)}
-              title="Editar"
-            >
-              <Pencil className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-destructive hover:text-destructive"
-              onClick={() => handleEliminarClick(empresa)}
-              title="Eliminar"
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
+            {/* Usar el slug correcto: empresa.update (sin 's') */}
+            <RequirePermission permission="empresa.update">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => handleEditarEmpresa(empresa)}
+                title="Editar"
+              >
+                <Pencil className="h-4 w-4" />
+              </Button>
+            </RequirePermission>
+            
+            {/* Usar el slug correcto: empresa.delete (sin 's') */}
+            <RequirePermission permission="empresa.delete">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-destructive hover:text-destructive"
+                onClick={() => handleEliminarClick(empresa)}
+                title="Eliminar"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </RequirePermission>
           </div>
         )
       },
@@ -154,63 +198,17 @@ function EmpresasPage() {
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
-      {/* Header del Admin */}
-      <header className="border-b bg-card px-6 py-4 flex justify-between items-center shadow-sm sticky top-0 z-50">
-        <div className="flex items-center gap-4">
-          {/* Logo de la Empresa */}
-          <div className="flex items-center gap-3">
-            {empresa?.logo ? (
-              <Avatar className="h-10 w-10 rounded-lg border">
-                <AvatarImage
-                  src={empresa.logo}
-                  alt={empresa.nombre}
-                  className="object-contain p-1"
-                />
-                <AvatarFallback className="bg-primary text-primary-foreground rounded-lg">
-                  <Building2 className="h-5 w-5" />
-                </AvatarFallback>
-              </Avatar>
-            ) : (
-              <Avatar className="h-10 w-10 rounded-lg border bg-primary">
-                <AvatarFallback className="text-primary-foreground">
-                  <Building2 className="h-5 w-5" />
-                </AvatarFallback>
-              </Avatar>
-            )}
-            <div>
-              <h1 className="text-xl font-bold text-foreground">
-                {empresa?.nombre || 'Correas Center'}
-              </h1>
-              <p className="text-xs text-muted-foreground">
-                Panel de Administración
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-4">
-          {/* Toggle Dark Mode */}
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={toggleDarkMode}
-            title={isDarkMode ? 'Modo Claro' : 'Modo Oscuro'}
-          >
-            {isDarkMode ? (
-              <Sun className="h-5 w-5" />
-            ) : (
-              <Moon className="h-5 w-5" />
-            )}
-          </Button>
-
-          {/* User Info */}
-          <div className="hidden md:flex items-center gap-2 text-sm text-muted-foreground">
-            <span>Admin</span>
-          </div>
-        </div>
-      </header>
-      <div className="max-w-1xl mx-10 space-y-2">
-        <Breadcrumbs items={[{ label: 'Gestión' }, { label: 'Empresas' }]} />
+      {/* Header SIEMPRE con los datos de la empresa */}
+      <AdminHeader empresa={empresa} />
+      
+      {/* Contenido principal */}
+      <div className="max-w-7xl mx-auto space-y-6 p-6">
+        <Breadcrumbs
+          items={[
+            { label: 'Catálogo Base' },
+            { label: 'Empresas' },
+          ]}
+        />
 
         <div className="flex items-center justify-between">
           <div>
@@ -219,15 +217,32 @@ function EmpresasPage() {
               Gestiona las empresas del sistema y sus logos corporativos.
             </p>
           </div>
-          <Button onClick={handleNuevaEmpresa}>
-            <Plus className="mr-2 h-4 w-4" />
-            Nueva Empresa
-          </Button>
+          <div className="flex gap-2">
+            {/* Botón para ver eliminados - Solo si tiene permiso */}
+            <RequirePermission permission="empresas.view_deleted">
+              <Button
+                variant={showDeleted ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setShowDeleted(!showDeleted)}
+              >
+                <Eye className="h-4 w-4 mr-2" />
+                {showDeleted ? 'Ocultar Eliminadas' : 'Ver Eliminadas'}
+              </Button>
+            </RequirePermission>
+
+            {/* Usar el slug correcto: empresa.create (sin 's') */}
+            <RequirePermission permission="empresa.create">
+              <Button onClick={handleNuevaEmpresa}>
+                <Plus className="mr-2 h-4 w-4" />
+                Nueva Empresa
+              </Button>
+            </RequirePermission>
+          </div>
         </div>
 
         <DataTable
           columns={columns}
-          data={empresas}
+          data={filteredEmpresas}
           searchKey="nombre"
           searchPlaceholder="Buscar empresas..."
         />

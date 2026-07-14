@@ -48,7 +48,7 @@ export async function crearEmpresa(dto: CreateEmpresaDTO) {
 
 export async function actualizarEmpresa(dto: UpdateEmpresaDTO) {
   const updateData: any = {}
-
+  
   if (dto.nombre !== undefined) updateData.nombre = dto.nombre
   if (dto.logo !== undefined) updateData.logo = dto.logo
   if (dto.estado !== undefined) {
@@ -74,12 +74,23 @@ export async function actualizarEmpresa(dto: UpdateEmpresaDTO) {
 
 export async function eliminarEmpresa(id: number) {
   const now = new Date().toISOString()
-
   const { error } = await supabaseAdmin
     .from('empresas')
-    .update({
+    .update({ 
       estado: 'eliminado',
-      eliminado_en: now,
+      eliminado_en: now 
+    })
+    .eq('id', id)
+
+  if (error) throw new Error(error.message)
+}
+
+export async function restaurarEmpresa(id: number) {
+  const { error } = await supabaseAdmin
+    .from('empresas')
+    .update({ 
+      estado: 'activo',
+      eliminado_en: null 
     })
     .eq('id', id)
 
