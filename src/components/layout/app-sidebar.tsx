@@ -1,36 +1,36 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {
-    Sidebar,
-    SidebarContent,
-    SidebarFooter,
-    SidebarGroup,
-    SidebarGroupContent,
-    SidebarGroupLabel,
-    SidebarMenu,
-    SidebarMenuButton,
-    SidebarMenuItem,
-    SidebarMenuSub,
-    SidebarMenuSubButton,
-    SidebarMenuSubItem,
-    SidebarRail,
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
+  SidebarRail,
 } from "@/components/ui/sidebar"
 import { useAuth } from "@/hooks/useAuth"
 import { useRouter } from "@tanstack/react-router"
 import {
-    Building2,
-    FileText,
-    LayoutDashboard,
-    LogOut,
-    Package,
-    Users
+  Building2,
+  FileText,
+  LayoutDashboard,
+  LogOut,
+  Package,
+  Users
 } from "lucide-react"
 
 const navMain = [
@@ -72,6 +72,7 @@ const navMain = [
     icon: Users,
     items: [
       { title: "Usuarios y Roles", url: "/usuarios" },
+      { title: "Roles y Permisos", url: "/roles" },
       { title: "Contactos", url: "/contactos" },
       { title: "Suscriptores", url: "/suscriptores" },
       { title: "Auditoría", url: "/auditoria" },
