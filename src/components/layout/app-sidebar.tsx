@@ -73,6 +73,7 @@ const navMain = [
     items: [
       { title: "Usuarios y Roles", url: "/usuarios" },
       { title: "Roles y Permisos", url: "/roles" },
+      { title: "Auditoría de Roles", url: "/roles-auditoria" },
       { title: "Contactos", url: "/contactos" },
       { title: "Suscriptores", url: "/suscriptores" },
       { title: "Auditoría", url: "/auditoria" },

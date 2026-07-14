@@ -1,7 +1,49 @@
 import { supabase, supabaseAdmin } from '@/lib/supabase'
 import type { CreateRolDTO, Permiso, PermisosAgrupados, Rol, UpdateRolDTO } from '@/types/rol'
 
-// Obtener todos los roles (incluyendo eliminados si se especifica)
+// Función helper para obtener IP del usuario
+async function getUserIP(): Promise<string> {
+  try {
+    const response = await fetch('https://api.ipify.org?format=json')
+    const data = await response.json()
+    return data.ip || 'unknown'
+  } catch {
+    return 'unknown'
+  }
+}
+
+// Función helper para registrar auditoría
+async function registrarAuditoria(params: {
+  accion: 'crear' | 'actualizar' | 'eliminar'
+  tabla_afectada: string
+  registro_id: string
+  datos_anteriores?: any
+  datos_nuevos?: any
+  metadata?: any
+}) {
+  try {
+    const ip = await getUserIP()
+    const userAgent = typeof window !== 'undefined' ? navigator.userAgent : 'server'
+
+    const { error } = await supabase.rpc('registrar_auditoria', {
+      p_accion: params.accion,
+      p_tabla_afectada: params.tabla_afectada,
+      p_registro_id: params.registro_id,
+      p_datos_anteriores: params.datos_anteriores || null,
+      p_datos_nuevos: params.datos_nuevos || null,
+      p_ip_address: ip,
+      p_user_agent: userAgent,
+      p_metadata: params.metadata || {},
+    })
+
+    if (error) {
+      console.error('Error registrando auditoría:', error)
+    }
+  } catch (err) {
+    console.error('Error en registrarAuditoria:', err)
+  }
+}
+
 export async function getRoles(includeDeleted: boolean = false): Promise<Rol[]> {
   let query = supabase
     .from('roles')
@@ -51,7 +93,6 @@ export async function getRoles(includeDeleted: boolean = false): Promise<Rol[]> 
   }))
 }
 
-// Obtener todos los permisos disponibles agrupados por grupo
 export async function getPermisosAgrupados(): Promise<PermisosAgrupados> {
   const { data, error } = await supabase
     .from('permisos')
@@ -62,7 +103,6 @@ export async function getPermisosAgrupados(): Promise<PermisosAgrupados> {
 
   if (error) throw error
 
-  // Agrupar permisos por grupo
   const agrupados: PermisosAgrupados = {}
   ;(data || []).forEach((permiso: Permiso) => {
     if (!agrupados[permiso.grupo]) {
@@ -74,7 +114,6 @@ export async function getPermisosAgrupados(): Promise<PermisosAgrupados> {
   return agrupados
 }
 
-// Crear un nuevo rol
 export async function crearRol(dto: CreateRolDTO) {
   // 1. Insertar el rol
   const { data: rolData, error: rolError } = await supabaseAdmin
@@ -105,12 +144,23 @@ export async function crearRol(dto: CreateRolDTO) {
     if (permError) throw new Error(permError.message)
   }
 
+  // 3. Registrar auditoría
+  await registrarAuditoria({
+    accion: 'crear',
+    tabla_afectada: 'roles',
+    registro_id: rolData.id.toString(),
+    datos_nuevos: { ...rolData, permiso_ids: dto.permiso_ids },
+    metadata: { source: 'frontend', action: 'crear_rol' },
+  })
+
   return rolData
 }
 
-// Actualizar un rol existente
 export async function actualizarRol(dto: UpdateRolDTO) {
-  // 1. Actualizar datos del rol
+  // 1. Obtener datos anteriores para auditoría
+  const rolAnterior = await getRolById(dto.id)
+
+  // 2. Actualizar datos del rol
   const { error: rolError } = await supabaseAdmin
     .from('roles')
     .update({
@@ -122,7 +172,7 @@ export async function actualizarRol(dto: UpdateRolDTO) {
 
   if (rolError) throw new Error(rolError.message)
 
-  // 2. Reemplazar permisos (borrar antiguos e insertar nuevos)
+  // 3. Reemplazar permisos
   const { error: deleteError } = await supabaseAdmin
     .from('rol_permiso')
     .delete()
@@ -142,12 +192,25 @@ export async function actualizarRol(dto: UpdateRolDTO) {
 
     if (insertError) throw new Error(insertError.message)
   }
+
+  // 4. Registrar auditoría
+  await registrarAuditoria({
+    accion: 'actualizar',
+    tabla_afectada: 'roles',
+    registro_id: dto.id.toString(),
+    datos_anteriores: rolAnterior,
+    datos_nuevos: dto,
+    metadata: { source: 'frontend', action: 'actualizar_rol' },
+  })
 }
 
-// Soft delete de un rol
 export async function eliminarRol(id: number) {
   const now = new Date().toISOString()
 
+  // 1. Obtener datos anteriores
+  const rolAnterior = await getRolById(id)
+
+  // 2. Soft delete
   const { error } = await supabaseAdmin
     .from('roles')
     .update({
@@ -157,9 +220,18 @@ export async function eliminarRol(id: number) {
     .eq('id', id)
 
   if (error) throw new Error(error.message)
+
+  // 3. Registrar auditoría
+  await registrarAuditoria({
+    accion: 'eliminar',
+    tabla_afectada: 'roles',
+    registro_id: id.toString(),
+    datos_anteriores: rolAnterior,
+    datos_nuevos: { estado: 'eliminado', eliminado_en: now },
+    metadata: { source: 'frontend', action: 'eliminar_rol' },
+  })
 }
 
-// Obtener un rol por ID
 export async function getRolById(id: number): Promise<Rol | null> {
   const { data, error } = await supabase
     .from('roles')
@@ -200,7 +272,6 @@ export async function getRolById(id: number): Promise<Rol | null> {
   }
 }
 
-// Traducir nombres de grupos al español
 export function traducirGrupo(grupo: string): string {
   const traducciones: Record<string, string> = {
     dashboard: 'Dashboard',

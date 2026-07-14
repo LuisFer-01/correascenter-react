@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as adminUsuariosRouteImport } from './routes/(admin)/usuarios'
+import { Route as adminRolesAuditoriaRouteImport } from './routes/(admin)/roles-auditoria'
 import { Route as adminRolesRouteImport } from './routes/(admin)/roles'
 import { Route as adminDashboardRouteImport } from './routes/(admin)/dashboard'
 import { Route as adminLayoutRouteImport } from './routes/(admin)/_layout'
@@ -29,6 +30,11 @@ const IndexRoute = IndexRouteImport.update({
 const adminUsuariosRoute = adminUsuariosRouteImport.update({
   id: '/(admin)/usuarios',
   path: '/usuarios',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const adminRolesAuditoriaRoute = adminRolesAuditoriaRouteImport.update({
+  id: '/(admin)/roles-auditoria',
+  path: '/roles-auditoria',
   getParentRoute: () => rootRouteImport,
 } as any)
 const adminRolesRoute = adminRolesRouteImport.update({
@@ -51,6 +57,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/dashboard': typeof adminDashboardRoute
   '/roles': typeof adminRolesRoute
+  '/roles-auditoria': typeof adminRolesAuditoriaRoute
   '/usuarios': typeof adminUsuariosRoute
 }
 export interface FileRoutesByTo {
@@ -58,6 +65,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/dashboard': typeof adminDashboardRoute
   '/roles': typeof adminRolesRoute
+  '/roles-auditoria': typeof adminRolesAuditoriaRoute
   '/usuarios': typeof adminUsuariosRoute
 }
 export interface FileRoutesById {
@@ -67,13 +75,16 @@ export interface FileRoutesById {
   '/(admin)/_layout': typeof adminLayoutRoute
   '/(admin)/dashboard': typeof adminDashboardRoute
   '/(admin)/roles': typeof adminRolesRoute
+  '/(admin)/roles-auditoria': typeof adminRolesAuditoriaRoute
   '/(admin)/usuarios': typeof adminUsuariosRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/dashboard' | '/roles' | '/usuarios'
+  fullPaths:
+    '/' | '/login' | '/dashboard' | '/roles' | '/roles-auditoria' | '/usuarios'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/dashboard' | '/roles' | '/usuarios'
+  to:
+    '/' | '/login' | '/dashboard' | '/roles' | '/roles-auditoria' | '/usuarios'
   id:
     | '__root__'
     | '/'
@@ -81,6 +92,7 @@ export interface FileRouteTypes {
     | '/(admin)/_layout'
     | '/(admin)/dashboard'
     | '/(admin)/roles'
+    | '/(admin)/roles-auditoria'
     | '/(admin)/usuarios'
   fileRoutesById: FileRoutesById
 }
@@ -90,6 +102,7 @@ export interface RootRouteChildren {
   adminLayoutRoute: typeof adminLayoutRoute
   adminDashboardRoute: typeof adminDashboardRoute
   adminRolesRoute: typeof adminRolesRoute
+  adminRolesAuditoriaRoute: typeof adminRolesAuditoriaRoute
   adminUsuariosRoute: typeof adminUsuariosRoute
 }
 
@@ -114,6 +127,13 @@ declare module '@tanstack/react-router' {
       path: '/usuarios'
       fullPath: '/usuarios'
       preLoaderRoute: typeof adminUsuariosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(admin)/roles-auditoria': {
+      id: '/(admin)/roles-auditoria'
+      path: '/roles-auditoria'
+      fullPath: '/roles-auditoria'
+      preLoaderRoute: typeof adminRolesAuditoriaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/(admin)/roles': {
@@ -146,6 +166,7 @@ const rootRouteChildren: RootRouteChildren = {
   adminLayoutRoute: adminLayoutRoute,
   adminDashboardRoute: adminDashboardRoute,
   adminRolesRoute: adminRolesRoute,
+  adminRolesAuditoriaRoute: adminRolesAuditoriaRoute,
   adminUsuariosRoute: adminUsuariosRoute,
 }
 export const routeTree = rootRouteImport
