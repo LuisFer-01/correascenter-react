@@ -16,9 +16,11 @@ import { Route as adminSucursalesRouteImport } from './routes/(admin)/sucursales
 import { Route as adminRolesAuditoriaRouteImport } from './routes/(admin)/roles-auditoria'
 import { Route as adminRolesRouteImport } from './routes/(admin)/roles'
 import { Route as adminRegistrosRouteImport } from './routes/(admin)/registros'
+import { Route as adminProductosRouteImport } from './routes/(admin)/productos'
 import { Route as adminPasosWizardRouteImport } from './routes/(admin)/pasos-wizard'
 import { Route as adminEmpresasRouteImport } from './routes/(admin)/empresas'
 import { Route as adminDashboardRouteImport } from './routes/(admin)/dashboard'
+import { Route as adminCategoriasRouteImport } from './routes/(admin)/categorias'
 import { Route as adminLayoutRouteImport } from './routes/(admin)/_layout'
 
 const LoginRoute = LoginRouteImport.update({
@@ -56,6 +58,11 @@ const adminRegistrosRoute = adminRegistrosRouteImport.update({
   path: '/registros',
   getParentRoute: () => rootRouteImport,
 } as any)
+const adminProductosRoute = adminProductosRouteImport.update({
+  id: '/(admin)/productos',
+  path: '/productos',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const adminPasosWizardRoute = adminPasosWizardRouteImport.update({
   id: '/(admin)/pasos-wizard',
   path: '/pasos-wizard',
@@ -71,6 +78,11 @@ const adminDashboardRoute = adminDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
+const adminCategoriasRoute = adminCategoriasRouteImport.update({
+  id: '/(admin)/categorias',
+  path: '/categorias',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const adminLayoutRoute = adminLayoutRouteImport.update({
   id: '/(admin)/_layout',
   getParentRoute: () => rootRouteImport,
@@ -79,9 +91,11 @@ const adminLayoutRoute = adminLayoutRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/categorias': typeof adminCategoriasRoute
   '/dashboard': typeof adminDashboardRoute
   '/empresas': typeof adminEmpresasRoute
   '/pasos-wizard': typeof adminPasosWizardRoute
+  '/productos': typeof adminProductosRoute
   '/registros': typeof adminRegistrosRoute
   '/roles': typeof adminRolesRoute
   '/roles-auditoria': typeof adminRolesAuditoriaRoute
@@ -91,9 +105,11 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/categorias': typeof adminCategoriasRoute
   '/dashboard': typeof adminDashboardRoute
   '/empresas': typeof adminEmpresasRoute
   '/pasos-wizard': typeof adminPasosWizardRoute
+  '/productos': typeof adminProductosRoute
   '/registros': typeof adminRegistrosRoute
   '/roles': typeof adminRolesRoute
   '/roles-auditoria': typeof adminRolesAuditoriaRoute
@@ -105,9 +121,11 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/(admin)/_layout': typeof adminLayoutRoute
+  '/(admin)/categorias': typeof adminCategoriasRoute
   '/(admin)/dashboard': typeof adminDashboardRoute
   '/(admin)/empresas': typeof adminEmpresasRoute
   '/(admin)/pasos-wizard': typeof adminPasosWizardRoute
+  '/(admin)/productos': typeof adminProductosRoute
   '/(admin)/registros': typeof adminRegistrosRoute
   '/(admin)/roles': typeof adminRolesRoute
   '/(admin)/roles-auditoria': typeof adminRolesAuditoriaRoute
@@ -119,9 +137,11 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/login'
+    | '/categorias'
     | '/dashboard'
     | '/empresas'
     | '/pasos-wizard'
+    | '/productos'
     | '/registros'
     | '/roles'
     | '/roles-auditoria'
@@ -131,9 +151,11 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/login'
+    | '/categorias'
     | '/dashboard'
     | '/empresas'
     | '/pasos-wizard'
+    | '/productos'
     | '/registros'
     | '/roles'
     | '/roles-auditoria'
@@ -144,9 +166,11 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/(admin)/_layout'
+    | '/(admin)/categorias'
     | '/(admin)/dashboard'
     | '/(admin)/empresas'
     | '/(admin)/pasos-wizard'
+    | '/(admin)/productos'
     | '/(admin)/registros'
     | '/(admin)/roles'
     | '/(admin)/roles-auditoria'
@@ -158,9 +182,11 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LoginRoute: typeof LoginRoute
   adminLayoutRoute: typeof adminLayoutRoute
+  adminCategoriasRoute: typeof adminCategoriasRoute
   adminDashboardRoute: typeof adminDashboardRoute
   adminEmpresasRoute: typeof adminEmpresasRoute
   adminPasosWizardRoute: typeof adminPasosWizardRoute
+  adminProductosRoute: typeof adminProductosRoute
   adminRegistrosRoute: typeof adminRegistrosRoute
   adminRolesRoute: typeof adminRolesRoute
   adminRolesAuditoriaRoute: typeof adminRolesAuditoriaRoute
@@ -219,6 +245,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof adminRegistrosRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/(admin)/productos': {
+      id: '/(admin)/productos'
+      path: '/productos'
+      fullPath: '/productos'
+      preLoaderRoute: typeof adminProductosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/(admin)/pasos-wizard': {
       id: '/(admin)/pasos-wizard'
       path: '/pasos-wizard'
@@ -240,6 +273,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof adminDashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/(admin)/categorias': {
+      id: '/(admin)/categorias'
+      path: '/categorias'
+      fullPath: '/categorias'
+      preLoaderRoute: typeof adminCategoriasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/(admin)/_layout': {
       id: '/(admin)/_layout'
       path: ''
@@ -254,9 +294,11 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LoginRoute: LoginRoute,
   adminLayoutRoute: adminLayoutRoute,
+  adminCategoriasRoute: adminCategoriasRoute,
   adminDashboardRoute: adminDashboardRoute,
   adminEmpresasRoute: adminEmpresasRoute,
   adminPasosWizardRoute: adminPasosWizardRoute,
+  adminProductosRoute: adminProductosRoute,
   adminRegistrosRoute: adminRegistrosRoute,
   adminRolesRoute: adminRolesRoute,
   adminRolesAuditoriaRoute: adminRolesAuditoriaRoute,

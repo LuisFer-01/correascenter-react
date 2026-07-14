@@ -1,4 +1,4 @@
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -6,7 +6,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from '@/components/ui/dropdown-menu'
 import {
   Sidebar,
   SidebarContent,
@@ -21,17 +21,17 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
   SidebarRail,
-} from "@/components/ui/sidebar"
-import { useAuth } from "@/hooks/useAuth"
-import { useRouter } from "@tanstack/react-router"
+} from '@/components/ui/sidebar'
+import { useAuth } from '@/hooks/useAuth'
+import { useRouter } from '@tanstack/react-router'
 import {
   Building2,
   FileText,
   LayoutDashboard,
   LogOut,
   Package,
-  Users
-} from "lucide-react"
+  Users,
+} from 'lucide-react'
 
 interface AppSidebarProps {
   empresa?: { nombre: string; logo: string | null }
@@ -39,51 +39,51 @@ interface AppSidebarProps {
 
 const navMain = [
   {
-    title: "Dashboard",
-    url: "/dashboard",
+    title: 'Dashboard',
+    url: '/dashboard',
     icon: LayoutDashboard,
   },
   {
-    title: "Catálogo",
+    title: 'Catálogo',
     icon: Package,
     items: [
-      { title: "Productos", url: "/productos" },
-      { title: "Categorías", url: "/categorias" },
-      { title: "Marcas", url: "/marcas" },
-      { title: "Atributos Técnicos", url: "/atributos" },
+      { title: 'Productos', url: '/productos' },
+      { title: 'Categorías', url: '/categorias' },
+      { title: 'Marcas', url: '/marcas' },
+      { title: 'Atributos Técnicos', url: '/atributos' },
     ],
   },
   {
-    title: "Aplicaciones",
+    title: 'Aplicaciones',
     icon: Building2,
     items: [
-      { title: "Industrias", url: "/industrias" },
-      { title: "Servicios", url: "/servicios" },
+      { title: 'Industrias', url: '/industrias' },
+      { title: 'Servicios', url: '/servicios' },
     ],
   },
   {
-    title: "Contenido Web",
+    title: 'Contenido Web',
     icon: FileText,
     items: [
-      { title: "Registros (About)", url: "/registros" },
-      { title: "Menús", url: "/menus" },
-      { title: "Secciones (Heroes, etc.)", url: "/secciones" },
-      { title: "Footers", url: "/footers" },
-      { title: "Wizard", url: "/pasos-wizard" },
+      { title: 'Registros (About)', url: '/registros' },
+      { title: 'Menús', url: '/menus' },
+      { title: 'Secciones (Heroes, etc.)', url: '/secciones' },
+      { title: 'Footers', url: '/footers' },
+      { title: 'Wizard', url: '/pasos-wizard' },
     ],
   },
   {
-    title: "Gestión",
+    title: 'Gestión',
     icon: Users,
     items: [
-      { title: "Empresas", url: "/empresas" },
-      { title: "Sucursales", url: "/sucursales" },
-      { title: "Usuarios y Roles", url: "/usuarios" },
-      { title: "Roles y Permisos", url: "/roles" },
-      { title: "Auditoría de Roles", url: "/roles-auditoria" },
-      { title: "Contactos", url: "/contactos" },
-      { title: "Suscriptores", url: "/suscriptores" },
-      { title: "Auditoría", url: "/auditoria" },
+      { title: 'Empresas', url: '/empresas' },
+      { title: 'Sucursales', url: '/sucursales' },
+      { title: 'Usuarios y Roles', url: '/usuarios' },
+      { title: 'Roles y Permisos', url: '/roles' },
+      { title: 'Auditoría de Roles', url: '/roles-auditoria' },
+      { title: 'Contactos', url: '/contactos' },
+      { title: 'Suscriptores', url: '/suscriptores' },
+      { title: 'Auditoría', url: '/auditoria' },
     ],
   },
 ]
@@ -98,8 +98,8 @@ export function AppSidebar({ empresa }: AppSidebarProps) {
 
   const handleLogout = async () => {
     await signOut()
-    router.navigate({ to: "/login" })
-    window.location.href = "/login"
+    router.navigate({ to: '/login' })
+    window.location.href = '/login'
   }
 
   return (
@@ -108,9 +108,15 @@ export function AppSidebar({ empresa }: AppSidebarProps) {
         <SidebarGroup>
           <SidebarGroupLabel className="text-lg font-bold text-primary flex items-center gap-2">
             {empresa?.logo && (
-              <img src={empresa.logo} alt="Logo" className="h-6 w-6 object-contain" />
+              <img
+                src={empresa.logo}
+                alt="Logo"
+                className="h-6 w-6 object-contain"
+              />
             )}
-            <span className="truncate">{empresa?.nombre || 'Correas Center'}</span>
+            <span className="truncate">
+              {empresa?.nombre || 'Correas Center'}
+            </span>
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -159,12 +165,12 @@ export function AppSidebar({ empresa }: AppSidebarProps) {
                 >
                   <Avatar className="h-8 w-8 rounded-lg">
                     <AvatarFallback className="rounded-lg bg-primary text-primary-foreground">
-                      {user?.email?.charAt(0).toUpperCase() || "U"}
+                      {user?.email?.charAt(0).toUpperCase() || 'U'}
                     </AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight">
                     <span className="truncate font-semibold">
-                      {user?.user_metadata?.nombre_completo || "Usuario"}
+                      {user?.user_metadata?.nombre_completo || 'Usuario'}
                     </span>
                     <span className="truncate text-xs text-muted-foreground">
                       {user?.email}
@@ -182,12 +188,12 @@ export function AppSidebar({ empresa }: AppSidebarProps) {
                   <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                     <Avatar className="h-8 w-8 rounded-lg">
                       <AvatarFallback className="rounded-lg bg-primary text-primary-foreground">
-                        {user?.email?.charAt(0).toUpperCase() || "U"}
+                        {user?.email?.charAt(0).toUpperCase() || 'U'}
                       </AvatarFallback>
                     </Avatar>
                     <div className="grid flex-1 text-left text-sm leading-tight">
                       <span className="truncate font-semibold">
-                        {user?.user_metadata?.nombre_completo || "Usuario"}
+                        {user?.user_metadata?.nombre_completo || 'Usuario'}
                       </span>
                       <span className="truncate text-xs text-muted-foreground">
                         {user?.email}
@@ -196,7 +202,10 @@ export function AppSidebar({ empresa }: AppSidebarProps) {
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout} className="text-destructive cursor-pointer">
+                <DropdownMenuItem
+                  onClick={handleLogout}
+                  className="text-destructive cursor-pointer"
+                >
                   <LogOut className="mr-2 h-4 w-4" />
                   Cerrar Sesión
                 </DropdownMenuItem>
