@@ -84,7 +84,22 @@ export async function eliminarSucursal(id: number) {
   const now = new Date().toISOString()
   const { error } = await supabaseAdmin
     .from('sucursales')
-    .update({ estado: 'eliminado', eliminado_en: now })
+    .update({ 
+      estado: 'eliminado',
+      eliminado_en: now 
+    })
+    .eq('id', id)
+
+  if (error) throw new Error(error.message)
+}
+
+export async function restaurarSucursal(id: number) {
+  const { error } = await supabaseAdmin
+    .from('sucursales')
+    .update({ 
+      estado: 'activo',
+      eliminado_en: null 
+    })
     .eq('id', id)
 
   if (error) throw new Error(error.message)

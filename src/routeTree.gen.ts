@@ -15,6 +15,7 @@ import { Route as adminUsuariosRouteImport } from './routes/(admin)/usuarios'
 import { Route as adminSucursalesRouteImport } from './routes/(admin)/sucursales'
 import { Route as adminRolesAuditoriaRouteImport } from './routes/(admin)/roles-auditoria'
 import { Route as adminRolesRouteImport } from './routes/(admin)/roles'
+import { Route as adminRegistrosRouteImport } from './routes/(admin)/registros'
 import { Route as adminEmpresasRouteImport } from './routes/(admin)/empresas'
 import { Route as adminDashboardRouteImport } from './routes/(admin)/dashboard'
 import { Route as adminLayoutRouteImport } from './routes/(admin)/_layout'
@@ -49,6 +50,11 @@ const adminRolesRoute = adminRolesRouteImport.update({
   path: '/roles',
   getParentRoute: () => rootRouteImport,
 } as any)
+const adminRegistrosRoute = adminRegistrosRouteImport.update({
+  id: '/(admin)/registros',
+  path: '/registros',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const adminEmpresasRoute = adminEmpresasRouteImport.update({
   id: '/(admin)/empresas',
   path: '/empresas',
@@ -69,6 +75,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/dashboard': typeof adminDashboardRoute
   '/empresas': typeof adminEmpresasRoute
+  '/registros': typeof adminRegistrosRoute
   '/roles': typeof adminRolesRoute
   '/roles-auditoria': typeof adminRolesAuditoriaRoute
   '/sucursales': typeof adminSucursalesRoute
@@ -79,6 +86,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/dashboard': typeof adminDashboardRoute
   '/empresas': typeof adminEmpresasRoute
+  '/registros': typeof adminRegistrosRoute
   '/roles': typeof adminRolesRoute
   '/roles-auditoria': typeof adminRolesAuditoriaRoute
   '/sucursales': typeof adminSucursalesRoute
@@ -91,6 +99,7 @@ export interface FileRoutesById {
   '/(admin)/_layout': typeof adminLayoutRoute
   '/(admin)/dashboard': typeof adminDashboardRoute
   '/(admin)/empresas': typeof adminEmpresasRoute
+  '/(admin)/registros': typeof adminRegistrosRoute
   '/(admin)/roles': typeof adminRolesRoute
   '/(admin)/roles-auditoria': typeof adminRolesAuditoriaRoute
   '/(admin)/sucursales': typeof adminSucursalesRoute
@@ -103,6 +112,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/dashboard'
     | '/empresas'
+    | '/registros'
     | '/roles'
     | '/roles-auditoria'
     | '/sucursales'
@@ -113,6 +123,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/dashboard'
     | '/empresas'
+    | '/registros'
     | '/roles'
     | '/roles-auditoria'
     | '/sucursales'
@@ -124,6 +135,7 @@ export interface FileRouteTypes {
     | '/(admin)/_layout'
     | '/(admin)/dashboard'
     | '/(admin)/empresas'
+    | '/(admin)/registros'
     | '/(admin)/roles'
     | '/(admin)/roles-auditoria'
     | '/(admin)/sucursales'
@@ -136,6 +148,7 @@ export interface RootRouteChildren {
   adminLayoutRoute: typeof adminLayoutRoute
   adminDashboardRoute: typeof adminDashboardRoute
   adminEmpresasRoute: typeof adminEmpresasRoute
+  adminRegistrosRoute: typeof adminRegistrosRoute
   adminRolesRoute: typeof adminRolesRoute
   adminRolesAuditoriaRoute: typeof adminRolesAuditoriaRoute
   adminSucursalesRoute: typeof adminSucursalesRoute
@@ -186,6 +199,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof adminRolesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/(admin)/registros': {
+      id: '/(admin)/registros'
+      path: '/registros'
+      fullPath: '/registros'
+      preLoaderRoute: typeof adminRegistrosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/(admin)/empresas': {
       id: '/(admin)/empresas'
       path: '/empresas'
@@ -216,6 +236,7 @@ const rootRouteChildren: RootRouteChildren = {
   adminLayoutRoute: adminLayoutRoute,
   adminDashboardRoute: adminDashboardRoute,
   adminEmpresasRoute: adminEmpresasRoute,
+  adminRegistrosRoute: adminRegistrosRoute,
   adminRolesRoute: adminRolesRoute,
   adminRolesAuditoriaRoute: adminRolesAuditoriaRoute,
   adminSucursalesRoute: adminSucursalesRoute,

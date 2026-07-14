@@ -65,6 +65,7 @@ const navMain = [
     title: "Contenido Web",
     icon: FileText,
     items: [
+      { title: "Registros (About)", url: "/registros" },
       { title: "Menús", url: "/menus" },
       { title: "Secciones (Heroes, etc.)", url: "/secciones" },
       { title: "Footers", url: "/footers" },
