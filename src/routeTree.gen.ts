@@ -18,6 +18,7 @@ import { Route as adminRolesRouteImport } from './routes/(admin)/roles'
 import { Route as adminRegistrosRouteImport } from './routes/(admin)/registros'
 import { Route as adminProductosRouteImport } from './routes/(admin)/productos'
 import { Route as adminPasosWizardRouteImport } from './routes/(admin)/pasos-wizard'
+import { Route as adminMarcasRouteImport } from './routes/(admin)/marcas'
 import { Route as adminEmpresasRouteImport } from './routes/(admin)/empresas'
 import { Route as adminDashboardRouteImport } from './routes/(admin)/dashboard'
 import { Route as adminCategoriasRouteImport } from './routes/(admin)/categorias'
@@ -68,6 +69,11 @@ const adminPasosWizardRoute = adminPasosWizardRouteImport.update({
   path: '/pasos-wizard',
   getParentRoute: () => rootRouteImport,
 } as any)
+const adminMarcasRoute = adminMarcasRouteImport.update({
+  id: '/(admin)/marcas',
+  path: '/marcas',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const adminEmpresasRoute = adminEmpresasRouteImport.update({
   id: '/(admin)/empresas',
   path: '/empresas',
@@ -94,6 +100,7 @@ export interface FileRoutesByFullPath {
   '/categorias': typeof adminCategoriasRoute
   '/dashboard': typeof adminDashboardRoute
   '/empresas': typeof adminEmpresasRoute
+  '/marcas': typeof adminMarcasRoute
   '/pasos-wizard': typeof adminPasosWizardRoute
   '/productos': typeof adminProductosRoute
   '/registros': typeof adminRegistrosRoute
@@ -108,6 +115,7 @@ export interface FileRoutesByTo {
   '/categorias': typeof adminCategoriasRoute
   '/dashboard': typeof adminDashboardRoute
   '/empresas': typeof adminEmpresasRoute
+  '/marcas': typeof adminMarcasRoute
   '/pasos-wizard': typeof adminPasosWizardRoute
   '/productos': typeof adminProductosRoute
   '/registros': typeof adminRegistrosRoute
@@ -124,6 +132,7 @@ export interface FileRoutesById {
   '/(admin)/categorias': typeof adminCategoriasRoute
   '/(admin)/dashboard': typeof adminDashboardRoute
   '/(admin)/empresas': typeof adminEmpresasRoute
+  '/(admin)/marcas': typeof adminMarcasRoute
   '/(admin)/pasos-wizard': typeof adminPasosWizardRoute
   '/(admin)/productos': typeof adminProductosRoute
   '/(admin)/registros': typeof adminRegistrosRoute
@@ -140,6 +149,7 @@ export interface FileRouteTypes {
     | '/categorias'
     | '/dashboard'
     | '/empresas'
+    | '/marcas'
     | '/pasos-wizard'
     | '/productos'
     | '/registros'
@@ -154,6 +164,7 @@ export interface FileRouteTypes {
     | '/categorias'
     | '/dashboard'
     | '/empresas'
+    | '/marcas'
     | '/pasos-wizard'
     | '/productos'
     | '/registros'
@@ -169,6 +180,7 @@ export interface FileRouteTypes {
     | '/(admin)/categorias'
     | '/(admin)/dashboard'
     | '/(admin)/empresas'
+    | '/(admin)/marcas'
     | '/(admin)/pasos-wizard'
     | '/(admin)/productos'
     | '/(admin)/registros'
@@ -185,6 +197,7 @@ export interface RootRouteChildren {
   adminCategoriasRoute: typeof adminCategoriasRoute
   adminDashboardRoute: typeof adminDashboardRoute
   adminEmpresasRoute: typeof adminEmpresasRoute
+  adminMarcasRoute: typeof adminMarcasRoute
   adminPasosWizardRoute: typeof adminPasosWizardRoute
   adminProductosRoute: typeof adminProductosRoute
   adminRegistrosRoute: typeof adminRegistrosRoute
@@ -259,6 +272,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof adminPasosWizardRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/(admin)/marcas': {
+      id: '/(admin)/marcas'
+      path: '/marcas'
+      fullPath: '/marcas'
+      preLoaderRoute: typeof adminMarcasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/(admin)/empresas': {
       id: '/(admin)/empresas'
       path: '/empresas'
@@ -297,6 +317,7 @@ const rootRouteChildren: RootRouteChildren = {
   adminCategoriasRoute: adminCategoriasRoute,
   adminDashboardRoute: adminDashboardRoute,
   adminEmpresasRoute: adminEmpresasRoute,
+  adminMarcasRoute: adminMarcasRoute,
   adminPasosWizardRoute: adminPasosWizardRoute,
   adminProductosRoute: adminProductosRoute,
   adminRegistrosRoute: adminRegistrosRoute,
