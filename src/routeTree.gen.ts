@@ -16,6 +16,7 @@ import { Route as adminSucursalesRouteImport } from './routes/(admin)/sucursales
 import { Route as adminRolesAuditoriaRouteImport } from './routes/(admin)/roles-auditoria'
 import { Route as adminRolesRouteImport } from './routes/(admin)/roles'
 import { Route as adminRegistrosRouteImport } from './routes/(admin)/registros'
+import { Route as adminPasosWizardRouteImport } from './routes/(admin)/pasos-wizard'
 import { Route as adminEmpresasRouteImport } from './routes/(admin)/empresas'
 import { Route as adminDashboardRouteImport } from './routes/(admin)/dashboard'
 import { Route as adminLayoutRouteImport } from './routes/(admin)/_layout'
@@ -55,6 +56,11 @@ const adminRegistrosRoute = adminRegistrosRouteImport.update({
   path: '/registros',
   getParentRoute: () => rootRouteImport,
 } as any)
+const adminPasosWizardRoute = adminPasosWizardRouteImport.update({
+  id: '/(admin)/pasos-wizard',
+  path: '/pasos-wizard',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const adminEmpresasRoute = adminEmpresasRouteImport.update({
   id: '/(admin)/empresas',
   path: '/empresas',
@@ -75,6 +81,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/dashboard': typeof adminDashboardRoute
   '/empresas': typeof adminEmpresasRoute
+  '/pasos-wizard': typeof adminPasosWizardRoute
   '/registros': typeof adminRegistrosRoute
   '/roles': typeof adminRolesRoute
   '/roles-auditoria': typeof adminRolesAuditoriaRoute
@@ -86,6 +93,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/dashboard': typeof adminDashboardRoute
   '/empresas': typeof adminEmpresasRoute
+  '/pasos-wizard': typeof adminPasosWizardRoute
   '/registros': typeof adminRegistrosRoute
   '/roles': typeof adminRolesRoute
   '/roles-auditoria': typeof adminRolesAuditoriaRoute
@@ -99,6 +107,7 @@ export interface FileRoutesById {
   '/(admin)/_layout': typeof adminLayoutRoute
   '/(admin)/dashboard': typeof adminDashboardRoute
   '/(admin)/empresas': typeof adminEmpresasRoute
+  '/(admin)/pasos-wizard': typeof adminPasosWizardRoute
   '/(admin)/registros': typeof adminRegistrosRoute
   '/(admin)/roles': typeof adminRolesRoute
   '/(admin)/roles-auditoria': typeof adminRolesAuditoriaRoute
@@ -112,6 +121,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/dashboard'
     | '/empresas'
+    | '/pasos-wizard'
     | '/registros'
     | '/roles'
     | '/roles-auditoria'
@@ -123,6 +133,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/dashboard'
     | '/empresas'
+    | '/pasos-wizard'
     | '/registros'
     | '/roles'
     | '/roles-auditoria'
@@ -135,6 +146,7 @@ export interface FileRouteTypes {
     | '/(admin)/_layout'
     | '/(admin)/dashboard'
     | '/(admin)/empresas'
+    | '/(admin)/pasos-wizard'
     | '/(admin)/registros'
     | '/(admin)/roles'
     | '/(admin)/roles-auditoria'
@@ -148,6 +160,7 @@ export interface RootRouteChildren {
   adminLayoutRoute: typeof adminLayoutRoute
   adminDashboardRoute: typeof adminDashboardRoute
   adminEmpresasRoute: typeof adminEmpresasRoute
+  adminPasosWizardRoute: typeof adminPasosWizardRoute
   adminRegistrosRoute: typeof adminRegistrosRoute
   adminRolesRoute: typeof adminRolesRoute
   adminRolesAuditoriaRoute: typeof adminRolesAuditoriaRoute
@@ -206,6 +219,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof adminRegistrosRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/(admin)/pasos-wizard': {
+      id: '/(admin)/pasos-wizard'
+      path: '/pasos-wizard'
+      fullPath: '/pasos-wizard'
+      preLoaderRoute: typeof adminPasosWizardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/(admin)/empresas': {
       id: '/(admin)/empresas'
       path: '/empresas'
@@ -236,6 +256,7 @@ const rootRouteChildren: RootRouteChildren = {
   adminLayoutRoute: adminLayoutRoute,
   adminDashboardRoute: adminDashboardRoute,
   adminEmpresasRoute: adminEmpresasRoute,
+  adminPasosWizardRoute: adminPasosWizardRoute,
   adminRegistrosRoute: adminRegistrosRoute,
   adminRolesRoute: adminRolesRoute,
   adminRolesAuditoriaRoute: adminRolesAuditoriaRoute,

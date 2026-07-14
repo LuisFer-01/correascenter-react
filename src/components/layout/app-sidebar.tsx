@@ -69,7 +69,7 @@ const navMain = [
       { title: "Menús", url: "/menus" },
       { title: "Secciones (Heroes, etc.)", url: "/secciones" },
       { title: "Footers", url: "/footers" },
-      { title: "Wizard", url: "/wizard" },
+      { title: "Wizard", url: "/pasos-wizard" },
     ],
   },
   {
