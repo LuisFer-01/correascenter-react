@@ -59,7 +59,7 @@ const navMain = [
     icon: Building2,
     items: [
       { title: "Industrias", url: "/industrias" },
-      { title: 'Servicios', url: '/servicios' },
+      { title: "Servicios", url: "/servicios" },
     ],
   },
   {

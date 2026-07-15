@@ -14,6 +14,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as adminUsuariosRouteImport } from './routes/(admin)/usuarios'
 import { Route as adminTiposAtributoRouteImport } from './routes/(admin)/tipos-atributo'
 import { Route as adminSucursalesRouteImport } from './routes/(admin)/sucursales'
+import { Route as adminServiciosRouteImport } from './routes/(admin)/servicios'
 import { Route as adminRolesAuditoriaRouteImport } from './routes/(admin)/roles-auditoria'
 import { Route as adminRolesRouteImport } from './routes/(admin)/roles'
 import { Route as adminRegistrosRouteImport } from './routes/(admin)/registros'
@@ -50,6 +51,11 @@ const adminTiposAtributoRoute = adminTiposAtributoRouteImport.update({
 const adminSucursalesRoute = adminSucursalesRouteImport.update({
   id: '/(admin)/sucursales',
   path: '/sucursales',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const adminServiciosRoute = adminServiciosRouteImport.update({
+  id: '/(admin)/servicios',
+  path: '/servicios',
   getParentRoute: () => rootRouteImport,
 } as any)
 const adminRolesAuditoriaRoute = adminRolesAuditoriaRouteImport.update({
@@ -126,6 +132,7 @@ export interface FileRoutesByFullPath {
   '/registros': typeof adminRegistrosRoute
   '/roles': typeof adminRolesRoute
   '/roles-auditoria': typeof adminRolesAuditoriaRoute
+  '/servicios': typeof adminServiciosRoute
   '/sucursales': typeof adminSucursalesRoute
   '/tipos-atributo': typeof adminTiposAtributoRoute
   '/usuarios': typeof adminUsuariosRoute
@@ -144,6 +151,7 @@ export interface FileRoutesByTo {
   '/registros': typeof adminRegistrosRoute
   '/roles': typeof adminRolesRoute
   '/roles-auditoria': typeof adminRolesAuditoriaRoute
+  '/servicios': typeof adminServiciosRoute
   '/sucursales': typeof adminSucursalesRoute
   '/tipos-atributo': typeof adminTiposAtributoRoute
   '/usuarios': typeof adminUsuariosRoute
@@ -164,6 +172,7 @@ export interface FileRoutesById {
   '/(admin)/registros': typeof adminRegistrosRoute
   '/(admin)/roles': typeof adminRolesRoute
   '/(admin)/roles-auditoria': typeof adminRolesAuditoriaRoute
+  '/(admin)/servicios': typeof adminServiciosRoute
   '/(admin)/sucursales': typeof adminSucursalesRoute
   '/(admin)/tipos-atributo': typeof adminTiposAtributoRoute
   '/(admin)/usuarios': typeof adminUsuariosRoute
@@ -184,6 +193,7 @@ export interface FileRouteTypes {
     | '/registros'
     | '/roles'
     | '/roles-auditoria'
+    | '/servicios'
     | '/sucursales'
     | '/tipos-atributo'
     | '/usuarios'
@@ -202,6 +212,7 @@ export interface FileRouteTypes {
     | '/registros'
     | '/roles'
     | '/roles-auditoria'
+    | '/servicios'
     | '/sucursales'
     | '/tipos-atributo'
     | '/usuarios'
@@ -221,6 +232,7 @@ export interface FileRouteTypes {
     | '/(admin)/registros'
     | '/(admin)/roles'
     | '/(admin)/roles-auditoria'
+    | '/(admin)/servicios'
     | '/(admin)/sucursales'
     | '/(admin)/tipos-atributo'
     | '/(admin)/usuarios'
@@ -241,6 +253,7 @@ export interface RootRouteChildren {
   adminRegistrosRoute: typeof adminRegistrosRoute
   adminRolesRoute: typeof adminRolesRoute
   adminRolesAuditoriaRoute: typeof adminRolesAuditoriaRoute
+  adminServiciosRoute: typeof adminServiciosRoute
   adminSucursalesRoute: typeof adminSucursalesRoute
   adminTiposAtributoRoute: typeof adminTiposAtributoRoute
   adminUsuariosRoute: typeof adminUsuariosRoute
@@ -281,6 +294,13 @@ declare module '@tanstack/react-router' {
       path: '/sucursales'
       fullPath: '/sucursales'
       preLoaderRoute: typeof adminSucursalesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(admin)/servicios': {
+      id: '/(admin)/servicios'
+      path: '/servicios'
+      fullPath: '/servicios'
+      preLoaderRoute: typeof adminServiciosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/(admin)/roles-auditoria': {
@@ -385,6 +405,7 @@ const rootRouteChildren: RootRouteChildren = {
   adminRegistrosRoute: adminRegistrosRoute,
   adminRolesRoute: adminRolesRoute,
   adminRolesAuditoriaRoute: adminRolesAuditoriaRoute,
+  adminServiciosRoute: adminServiciosRoute,
   adminSucursalesRoute: adminSucursalesRoute,
   adminTiposAtributoRoute: adminTiposAtributoRoute,
   adminUsuariosRoute: adminUsuariosRoute,
