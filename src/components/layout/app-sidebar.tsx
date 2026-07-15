@@ -50,6 +50,7 @@ const navMain = [
       { title: 'Productos', url: '/productos' },
       { title: 'Categorías', url: '/categorias' },
       { title: 'Marcas', url: '/marcas' },
+      { title: "Tipos de Atributo", url: "/tipos-atributo" },
       { title: 'Atributos Técnicos', url: '/atributos' },
     ],
   },
