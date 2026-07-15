@@ -14,6 +14,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as adminUsuariosRouteImport } from './routes/(admin)/usuarios'
 import { Route as adminTiposSeccionRouteImport } from './routes/(admin)/tipos-seccion'
 import { Route as adminTiposAtributoRouteImport } from './routes/(admin)/tipos-atributo'
+import { Route as adminSuscriptoresRouteImport } from './routes/(admin)/suscriptores'
 import { Route as adminSucursalesRouteImport } from './routes/(admin)/sucursales'
 import { Route as adminServiciosRouteImport } from './routes/(admin)/servicios'
 import { Route as adminSeccionesRouteImport } from './routes/(admin)/secciones'
@@ -56,6 +57,11 @@ const adminTiposSeccionRoute = adminTiposSeccionRouteImport.update({
 const adminTiposAtributoRoute = adminTiposAtributoRouteImport.update({
   id: '/(admin)/tipos-atributo',
   path: '/tipos-atributo',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const adminSuscriptoresRoute = adminSuscriptoresRouteImport.update({
+  id: '/(admin)/suscriptores',
+  path: '/suscriptores',
   getParentRoute: () => rootRouteImport,
 } as any)
 const adminSucursalesRoute = adminSucursalesRouteImport.update({
@@ -168,6 +174,7 @@ export interface FileRoutesByFullPath {
   '/secciones': typeof adminSeccionesRoute
   '/servicios': typeof adminServiciosRoute
   '/sucursales': typeof adminSucursalesRoute
+  '/suscriptores': typeof adminSuscriptoresRoute
   '/tipos-atributo': typeof adminTiposAtributoRoute
   '/tipos-seccion': typeof adminTiposSeccionRoute
   '/usuarios': typeof adminUsuariosRoute
@@ -192,6 +199,7 @@ export interface FileRoutesByTo {
   '/secciones': typeof adminSeccionesRoute
   '/servicios': typeof adminServiciosRoute
   '/sucursales': typeof adminSucursalesRoute
+  '/suscriptores': typeof adminSuscriptoresRoute
   '/tipos-atributo': typeof adminTiposAtributoRoute
   '/tipos-seccion': typeof adminTiposSeccionRoute
   '/usuarios': typeof adminUsuariosRoute
@@ -218,6 +226,7 @@ export interface FileRoutesById {
   '/(admin)/secciones': typeof adminSeccionesRoute
   '/(admin)/servicios': typeof adminServiciosRoute
   '/(admin)/sucursales': typeof adminSucursalesRoute
+  '/(admin)/suscriptores': typeof adminSuscriptoresRoute
   '/(admin)/tipos-atributo': typeof adminTiposAtributoRoute
   '/(admin)/tipos-seccion': typeof adminTiposSeccionRoute
   '/(admin)/usuarios': typeof adminUsuariosRoute
@@ -244,6 +253,7 @@ export interface FileRouteTypes {
     | '/secciones'
     | '/servicios'
     | '/sucursales'
+    | '/suscriptores'
     | '/tipos-atributo'
     | '/tipos-seccion'
     | '/usuarios'
@@ -268,6 +278,7 @@ export interface FileRouteTypes {
     | '/secciones'
     | '/servicios'
     | '/sucursales'
+    | '/suscriptores'
     | '/tipos-atributo'
     | '/tipos-seccion'
     | '/usuarios'
@@ -293,6 +304,7 @@ export interface FileRouteTypes {
     | '/(admin)/secciones'
     | '/(admin)/servicios'
     | '/(admin)/sucursales'
+    | '/(admin)/suscriptores'
     | '/(admin)/tipos-atributo'
     | '/(admin)/tipos-seccion'
     | '/(admin)/usuarios'
@@ -319,6 +331,7 @@ export interface RootRouteChildren {
   adminSeccionesRoute: typeof adminSeccionesRoute
   adminServiciosRoute: typeof adminServiciosRoute
   adminSucursalesRoute: typeof adminSucursalesRoute
+  adminSuscriptoresRoute: typeof adminSuscriptoresRoute
   adminTiposAtributoRoute: typeof adminTiposAtributoRoute
   adminTiposSeccionRoute: typeof adminTiposSeccionRoute
   adminUsuariosRoute: typeof adminUsuariosRoute
@@ -359,6 +372,13 @@ declare module '@tanstack/react-router' {
       path: '/tipos-atributo'
       fullPath: '/tipos-atributo'
       preLoaderRoute: typeof adminTiposAtributoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(admin)/suscriptores': {
+      id: '/(admin)/suscriptores'
+      path: '/suscriptores'
+      fullPath: '/suscriptores'
+      preLoaderRoute: typeof adminSuscriptoresRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/(admin)/sucursales': {
@@ -511,6 +531,7 @@ const rootRouteChildren: RootRouteChildren = {
   adminSeccionesRoute: adminSeccionesRoute,
   adminServiciosRoute: adminServiciosRoute,
   adminSucursalesRoute: adminSucursalesRoute,
+  adminSuscriptoresRoute: adminSuscriptoresRoute,
   adminTiposAtributoRoute: adminTiposAtributoRoute,
   adminTiposSeccionRoute: adminTiposSeccionRoute,
   adminUsuariosRoute: adminUsuariosRoute,
