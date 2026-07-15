@@ -23,6 +23,7 @@ import { Route as adminPasosWizardRouteImport } from './routes/(admin)/pasos-wiz
 import { Route as adminMenusRouteImport } from './routes/(admin)/menus'
 import { Route as adminMarcasRouteImport } from './routes/(admin)/marcas'
 import { Route as adminIndustriasRouteImport } from './routes/(admin)/industrias'
+import { Route as adminFootersRouteImport } from './routes/(admin)/footers'
 import { Route as adminEmpresasRouteImport } from './routes/(admin)/empresas'
 import { Route as adminDashboardRouteImport } from './routes/(admin)/dashboard'
 import { Route as adminCategoriasRouteImport } from './routes/(admin)/categorias'
@@ -99,6 +100,11 @@ const adminIndustriasRoute = adminIndustriasRouteImport.update({
   path: '/industrias',
   getParentRoute: () => rootRouteImport,
 } as any)
+const adminFootersRoute = adminFootersRouteImport.update({
+  id: '/(admin)/footers',
+  path: '/footers',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const adminEmpresasRoute = adminEmpresasRouteImport.update({
   id: '/(admin)/empresas',
   path: '/empresas',
@@ -131,6 +137,7 @@ export interface FileRoutesByFullPath {
   '/categorias': typeof adminCategoriasRoute
   '/dashboard': typeof adminDashboardRoute
   '/empresas': typeof adminEmpresasRoute
+  '/footers': typeof adminFootersRoute
   '/industrias': typeof adminIndustriasRoute
   '/marcas': typeof adminMarcasRoute
   '/menus': typeof adminMenusRoute
@@ -151,6 +158,7 @@ export interface FileRoutesByTo {
   '/categorias': typeof adminCategoriasRoute
   '/dashboard': typeof adminDashboardRoute
   '/empresas': typeof adminEmpresasRoute
+  '/footers': typeof adminFootersRoute
   '/industrias': typeof adminIndustriasRoute
   '/marcas': typeof adminMarcasRoute
   '/menus': typeof adminMenusRoute
@@ -173,6 +181,7 @@ export interface FileRoutesById {
   '/(admin)/categorias': typeof adminCategoriasRoute
   '/(admin)/dashboard': typeof adminDashboardRoute
   '/(admin)/empresas': typeof adminEmpresasRoute
+  '/(admin)/footers': typeof adminFootersRoute
   '/(admin)/industrias': typeof adminIndustriasRoute
   '/(admin)/marcas': typeof adminMarcasRoute
   '/(admin)/menus': typeof adminMenusRoute
@@ -195,6 +204,7 @@ export interface FileRouteTypes {
     | '/categorias'
     | '/dashboard'
     | '/empresas'
+    | '/footers'
     | '/industrias'
     | '/marcas'
     | '/menus'
@@ -215,6 +225,7 @@ export interface FileRouteTypes {
     | '/categorias'
     | '/dashboard'
     | '/empresas'
+    | '/footers'
     | '/industrias'
     | '/marcas'
     | '/menus'
@@ -236,6 +247,7 @@ export interface FileRouteTypes {
     | '/(admin)/categorias'
     | '/(admin)/dashboard'
     | '/(admin)/empresas'
+    | '/(admin)/footers'
     | '/(admin)/industrias'
     | '/(admin)/marcas'
     | '/(admin)/menus'
@@ -258,6 +270,7 @@ export interface RootRouteChildren {
   adminCategoriasRoute: typeof adminCategoriasRoute
   adminDashboardRoute: typeof adminDashboardRoute
   adminEmpresasRoute: typeof adminEmpresasRoute
+  adminFootersRoute: typeof adminFootersRoute
   adminIndustriasRoute: typeof adminIndustriasRoute
   adminMarcasRoute: typeof adminMarcasRoute
   adminMenusRoute: typeof adminMenusRoute
@@ -372,6 +385,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof adminIndustriasRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/(admin)/footers': {
+      id: '/(admin)/footers'
+      path: '/footers'
+      fullPath: '/footers'
+      preLoaderRoute: typeof adminFootersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/(admin)/empresas': {
       id: '/(admin)/empresas'
       path: '/empresas'
@@ -418,6 +438,7 @@ const rootRouteChildren: RootRouteChildren = {
   adminCategoriasRoute: adminCategoriasRoute,
   adminDashboardRoute: adminDashboardRoute,
   adminEmpresasRoute: adminEmpresasRoute,
+  adminFootersRoute: adminFootersRoute,
   adminIndustriasRoute: adminIndustriasRoute,
   adminMarcasRoute: adminMarcasRoute,
   adminMenusRoute: adminMenusRoute,
