@@ -31,6 +31,7 @@ import { Route as adminEmpresasRouteImport } from './routes/(admin)/empresas'
 import { Route as adminDashboardRouteImport } from './routes/(admin)/dashboard'
 import { Route as adminContactosRouteImport } from './routes/(admin)/contactos'
 import { Route as adminCategoriasRouteImport } from './routes/(admin)/categorias'
+import { Route as adminAuditoriaRouteImport } from './routes/(admin)/auditoria'
 import { Route as adminAtributosRouteImport } from './routes/(admin)/atributos'
 import { Route as adminLayoutRouteImport } from './routes/(admin)/_layout'
 
@@ -144,6 +145,11 @@ const adminCategoriasRoute = adminCategoriasRouteImport.update({
   path: '/categorias',
   getParentRoute: () => rootRouteImport,
 } as any)
+const adminAuditoriaRoute = adminAuditoriaRouteImport.update({
+  id: '/(admin)/auditoria',
+  path: '/auditoria',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const adminAtributosRoute = adminAtributosRouteImport.update({
   id: '/(admin)/atributos',
   path: '/atributos',
@@ -158,6 +164,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/atributos': typeof adminAtributosRoute
+  '/auditoria': typeof adminAuditoriaRoute
   '/categorias': typeof adminCategoriasRoute
   '/contactos': typeof adminContactosRoute
   '/dashboard': typeof adminDashboardRoute
@@ -183,6 +190,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/atributos': typeof adminAtributosRoute
+  '/auditoria': typeof adminAuditoriaRoute
   '/categorias': typeof adminCategoriasRoute
   '/contactos': typeof adminContactosRoute
   '/dashboard': typeof adminDashboardRoute
@@ -210,6 +218,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/(admin)/_layout': typeof adminLayoutRoute
   '/(admin)/atributos': typeof adminAtributosRoute
+  '/(admin)/auditoria': typeof adminAuditoriaRoute
   '/(admin)/categorias': typeof adminCategoriasRoute
   '/(admin)/contactos': typeof adminContactosRoute
   '/(admin)/dashboard': typeof adminDashboardRoute
@@ -237,6 +246,7 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/atributos'
+    | '/auditoria'
     | '/categorias'
     | '/contactos'
     | '/dashboard'
@@ -262,6 +272,7 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/atributos'
+    | '/auditoria'
     | '/categorias'
     | '/contactos'
     | '/dashboard'
@@ -288,6 +299,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/(admin)/_layout'
     | '/(admin)/atributos'
+    | '/(admin)/auditoria'
     | '/(admin)/categorias'
     | '/(admin)/contactos'
     | '/(admin)/dashboard'
@@ -315,6 +327,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   adminLayoutRoute: typeof adminLayoutRoute
   adminAtributosRoute: typeof adminAtributosRoute
+  adminAuditoriaRoute: typeof adminAuditoriaRoute
   adminCategoriasRoute: typeof adminCategoriasRoute
   adminContactosRoute: typeof adminContactosRoute
   adminDashboardRoute: typeof adminDashboardRoute
@@ -493,6 +506,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof adminCategoriasRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/(admin)/auditoria': {
+      id: '/(admin)/auditoria'
+      path: '/auditoria'
+      fullPath: '/auditoria'
+      preLoaderRoute: typeof adminAuditoriaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/(admin)/atributos': {
       id: '/(admin)/atributos'
       path: '/atributos'
@@ -515,6 +535,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   adminLayoutRoute: adminLayoutRoute,
   adminAtributosRoute: adminAtributosRoute,
+  adminAuditoriaRoute: adminAuditoriaRoute,
   adminCategoriasRoute: adminCategoriasRoute,
   adminContactosRoute: adminContactosRoute,
   adminDashboardRoute: adminDashboardRoute,
