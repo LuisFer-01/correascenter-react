@@ -28,6 +28,7 @@ import { Route as adminIndustriasRouteImport } from './routes/(admin)/industrias
 import { Route as adminFootersRouteImport } from './routes/(admin)/footers'
 import { Route as adminEmpresasRouteImport } from './routes/(admin)/empresas'
 import { Route as adminDashboardRouteImport } from './routes/(admin)/dashboard'
+import { Route as adminContactosRouteImport } from './routes/(admin)/contactos'
 import { Route as adminCategoriasRouteImport } from './routes/(admin)/categorias'
 import { Route as adminAtributosRouteImport } from './routes/(admin)/atributos'
 import { Route as adminLayoutRouteImport } from './routes/(admin)/_layout'
@@ -127,6 +128,11 @@ const adminDashboardRoute = adminDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
+const adminContactosRoute = adminContactosRouteImport.update({
+  id: '/(admin)/contactos',
+  path: '/contactos',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const adminCategoriasRoute = adminCategoriasRouteImport.update({
   id: '/(admin)/categorias',
   path: '/categorias',
@@ -147,6 +153,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/atributos': typeof adminAtributosRoute
   '/categorias': typeof adminCategoriasRoute
+  '/contactos': typeof adminContactosRoute
   '/dashboard': typeof adminDashboardRoute
   '/empresas': typeof adminEmpresasRoute
   '/footers': typeof adminFootersRoute
@@ -170,6 +177,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/atributos': typeof adminAtributosRoute
   '/categorias': typeof adminCategoriasRoute
+  '/contactos': typeof adminContactosRoute
   '/dashboard': typeof adminDashboardRoute
   '/empresas': typeof adminEmpresasRoute
   '/footers': typeof adminFootersRoute
@@ -195,6 +203,7 @@ export interface FileRoutesById {
   '/(admin)/_layout': typeof adminLayoutRoute
   '/(admin)/atributos': typeof adminAtributosRoute
   '/(admin)/categorias': typeof adminCategoriasRoute
+  '/(admin)/contactos': typeof adminContactosRoute
   '/(admin)/dashboard': typeof adminDashboardRoute
   '/(admin)/empresas': typeof adminEmpresasRoute
   '/(admin)/footers': typeof adminFootersRoute
@@ -220,6 +229,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/atributos'
     | '/categorias'
+    | '/contactos'
     | '/dashboard'
     | '/empresas'
     | '/footers'
@@ -243,6 +253,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/atributos'
     | '/categorias'
+    | '/contactos'
     | '/dashboard'
     | '/empresas'
     | '/footers'
@@ -267,6 +278,7 @@ export interface FileRouteTypes {
     | '/(admin)/_layout'
     | '/(admin)/atributos'
     | '/(admin)/categorias'
+    | '/(admin)/contactos'
     | '/(admin)/dashboard'
     | '/(admin)/empresas'
     | '/(admin)/footers'
@@ -292,6 +304,7 @@ export interface RootRouteChildren {
   adminLayoutRoute: typeof adminLayoutRoute
   adminAtributosRoute: typeof adminAtributosRoute
   adminCategoriasRoute: typeof adminCategoriasRoute
+  adminContactosRoute: typeof adminContactosRoute
   adminDashboardRoute: typeof adminDashboardRoute
   adminEmpresasRoute: typeof adminEmpresasRoute
   adminFootersRoute: typeof adminFootersRoute
@@ -446,6 +459,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof adminDashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/(admin)/contactos': {
+      id: '/(admin)/contactos'
+      path: '/contactos'
+      fullPath: '/contactos'
+      preLoaderRoute: typeof adminContactosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/(admin)/categorias': {
       id: '/(admin)/categorias'
       path: '/categorias'
@@ -476,6 +496,7 @@ const rootRouteChildren: RootRouteChildren = {
   adminLayoutRoute: adminLayoutRoute,
   adminAtributosRoute: adminAtributosRoute,
   adminCategoriasRoute: adminCategoriasRoute,
+  adminContactosRoute: adminContactosRoute,
   adminDashboardRoute: adminDashboardRoute,
   adminEmpresasRoute: adminEmpresasRoute,
   adminFootersRoute: adminFootersRoute,
