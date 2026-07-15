@@ -1,3 +1,9 @@
+export interface MarcaResumen {
+  id: number
+  nombre: string
+  slug: string
+}
+
 export interface Producto {
   id: number
   empresa_id: number
@@ -10,6 +16,7 @@ export interface Producto {
   creado_en: string
   actualizado_en: string
   empresa?: { id: number; nombre: string }
+  marcas?: MarcaResumen[]
 }
 
 export interface CreateProductoDTO {
@@ -19,6 +26,7 @@ export interface CreateProductoDTO {
   imagen?: string
   orden?: number
   estado?: 'activo' | 'inactivo'
+  marca_ids: number[]
 }
 
 export interface UpdateProductoDTO {
@@ -29,4 +37,5 @@ export interface UpdateProductoDTO {
   imagen?: string
   orden?: number
   estado?: 'activo' | 'inactivo' | 'eliminado'
+  marca_ids: number[]
 }

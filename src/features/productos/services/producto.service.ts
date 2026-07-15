@@ -9,6 +9,13 @@ export async function getProductos(includeDeleted: boolean = false): Promise<Pro
       empresa:empresas (
         id,
         nombre
+      ),
+      producto_marca (
+        marcas (
+          id,
+          nombre,
+          slug
+        )
       )
     `)
 
@@ -24,10 +31,21 @@ export async function getProductos(includeDeleted: boolean = false): Promise<Pro
   return (data || []).map((p: any) => ({
     ...p,
     estado: p.estado || 'activo',
+    marcas: p.producto_marca?.map((pm: any) => pm.marcas).filter(Boolean) || [],
   }))
 }
 
-// Obtener el máximo orden existente + 1
+export async function getMarcasActivas() {
+  const { data, error } = await supabase
+    .from('marcas')
+    .select('id, nombre, slug')
+    .eq('estado', 'activo')
+    .order('nombre', { ascending: true })
+
+  if (error) throw error
+  return data || []
+}
+
 export async function getNextOrden(): Promise<number> {
   const { data, error } = await supabase
     .from('productos')
@@ -51,30 +69,27 @@ export async function getEmpresasActivas() {
   return data || []
 }
 
-// Función para generar slug único
 async function generarSlugUnico(slugBase: string): Promise<string> {
   let slug = slugBase
   let contador = 1
-  
+
   while (true) {
     const { data } = await supabase
       .from('productos')
       .select('id')
       .eq('slug', slug)
       .single()
-    
-    if (!data) return slug // Slug disponible
-    
+
+    if (!data) return slug
     slug = `${slugBase}-${contador}`
     contador++
   }
 }
 
 export async function crearProducto(dto: CreateProductoDTO) {
-  // Generar slug único
   const slugFinal = await generarSlugUnico(dto.slug)
 
-  const { data, error } = await supabaseAdmin
+  const { data: productoData, error: productoError } = await supabaseAdmin
     .from('productos')
     .insert({
       empresa_id: dto.empresa_id,
@@ -87,8 +102,23 @@ export async function crearProducto(dto: CreateProductoDTO) {
     .select()
     .single()
 
-  if (error) throw new Error(error.message)
-  return data
+  if (productoError) throw new Error(productoError.message)
+
+  // Asociar marcas
+  if (dto.marca_ids && dto.marca_ids.length > 0) {
+    const asociaciones = dto.marca_ids.map((marcaId) => ({
+      producto_id: productoData.id,
+      marca_id: marcaId,
+    }))
+
+    const { error: marcaError } = await supabaseAdmin
+      .from('producto_marca')
+      .insert(asociaciones)
+
+    if (marcaError) throw new Error(marcaError.message)
+  }
+
+  return productoData
 }
 
 export async function actualizarProducto(dto: UpdateProductoDTO) {
@@ -98,7 +128,6 @@ export async function actualizarProducto(dto: UpdateProductoDTO) {
   if (dto.nombre !== undefined) updateData.nombre = dto.nombre
   
   if (dto.slug !== undefined) {
-    // Verificar que el slug no esté en uso por otro producto
     const { data: existe } = await supabase
       .from('productos')
       .select('id')
@@ -124,15 +153,41 @@ export async function actualizarProducto(dto: UpdateProductoDTO) {
     }
   }
 
-  const { data, error } = await supabaseAdmin
+  const { data: productoData, error: productoError } = await supabaseAdmin
     .from('productos')
     .update(updateData)
     .eq('id', dto.id)
     .select()
     .single()
 
-  if (error) throw new Error(error.message)
-  return data
+  if (productoError) throw new Error(productoError.message)
+
+  // Actualizar asociaciones de marcas
+  if (dto.marca_ids !== undefined) {
+    // Borrar asociaciones antiguas
+    const { error: deleteError } = await supabaseAdmin
+      .from('producto_marca')
+      .delete()
+      .eq('producto_id', dto.id)
+
+    if (deleteError) throw new Error(deleteError.message)
+
+    // Insertar nuevas asociaciones
+    if (dto.marca_ids.length > 0) {
+      const asociaciones = dto.marca_ids.map((marcaId) => ({
+        producto_id: dto.id,
+        marca_id: marcaId,
+      }))
+
+      const { error: insertError } = await supabaseAdmin
+        .from('producto_marca')
+        .insert(asociaciones)
+
+      if (insertError) throw new Error(insertError.message)
+    }
+  }
+
+  return productoData
 }
 
 export async function eliminarProducto(id: number) {

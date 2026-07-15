@@ -137,6 +137,23 @@ function ProductosPage() {
       ),
     },
     {
+      accessorKey: 'marcas',
+      header: 'Marcas',
+      cell: ({ row }) => (
+        <div className="flex flex-wrap gap-1">
+          {row.original.marcas && row.original.marcas.length > 0 ? (
+            row.original.marcas.map((marca) => (
+              <Badge key={marca.id} variant="secondary" className="text-xs">
+                {marca.nombre}
+              </Badge>
+            ))
+          ) : (
+            <span className="text-sm text-muted-foreground">—</span>
+          )}
+        </div>
+      ),
+    },
+    {
       accessorKey: 'empresa',
       header: 'Empresa',
       cell: ({ row }) => (
