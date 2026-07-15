@@ -12,9 +12,11 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as adminUsuariosRouteImport } from './routes/(admin)/usuarios'
+import { Route as adminTiposSeccionRouteImport } from './routes/(admin)/tipos-seccion'
 import { Route as adminTiposAtributoRouteImport } from './routes/(admin)/tipos-atributo'
 import { Route as adminSucursalesRouteImport } from './routes/(admin)/sucursales'
 import { Route as adminServiciosRouteImport } from './routes/(admin)/servicios'
+import { Route as adminSeccionesRouteImport } from './routes/(admin)/secciones'
 import { Route as adminRolesAuditoriaRouteImport } from './routes/(admin)/roles-auditoria'
 import { Route as adminRolesRouteImport } from './routes/(admin)/roles'
 import { Route as adminRegistrosRouteImport } from './routes/(admin)/registros'
@@ -45,6 +47,11 @@ const adminUsuariosRoute = adminUsuariosRouteImport.update({
   path: '/usuarios',
   getParentRoute: () => rootRouteImport,
 } as any)
+const adminTiposSeccionRoute = adminTiposSeccionRouteImport.update({
+  id: '/(admin)/tipos-seccion',
+  path: '/tipos-seccion',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const adminTiposAtributoRoute = adminTiposAtributoRouteImport.update({
   id: '/(admin)/tipos-atributo',
   path: '/tipos-atributo',
@@ -58,6 +65,11 @@ const adminSucursalesRoute = adminSucursalesRouteImport.update({
 const adminServiciosRoute = adminServiciosRouteImport.update({
   id: '/(admin)/servicios',
   path: '/servicios',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const adminSeccionesRoute = adminSeccionesRouteImport.update({
+  id: '/(admin)/secciones',
+  path: '/secciones',
   getParentRoute: () => rootRouteImport,
 } as any)
 const adminRolesAuditoriaRoute = adminRolesAuditoriaRouteImport.update({
@@ -146,9 +158,11 @@ export interface FileRoutesByFullPath {
   '/registros': typeof adminRegistrosRoute
   '/roles': typeof adminRolesRoute
   '/roles-auditoria': typeof adminRolesAuditoriaRoute
+  '/secciones': typeof adminSeccionesRoute
   '/servicios': typeof adminServiciosRoute
   '/sucursales': typeof adminSucursalesRoute
   '/tipos-atributo': typeof adminTiposAtributoRoute
+  '/tipos-seccion': typeof adminTiposSeccionRoute
   '/usuarios': typeof adminUsuariosRoute
 }
 export interface FileRoutesByTo {
@@ -167,9 +181,11 @@ export interface FileRoutesByTo {
   '/registros': typeof adminRegistrosRoute
   '/roles': typeof adminRolesRoute
   '/roles-auditoria': typeof adminRolesAuditoriaRoute
+  '/secciones': typeof adminSeccionesRoute
   '/servicios': typeof adminServiciosRoute
   '/sucursales': typeof adminSucursalesRoute
   '/tipos-atributo': typeof adminTiposAtributoRoute
+  '/tipos-seccion': typeof adminTiposSeccionRoute
   '/usuarios': typeof adminUsuariosRoute
 }
 export interface FileRoutesById {
@@ -190,9 +206,11 @@ export interface FileRoutesById {
   '/(admin)/registros': typeof adminRegistrosRoute
   '/(admin)/roles': typeof adminRolesRoute
   '/(admin)/roles-auditoria': typeof adminRolesAuditoriaRoute
+  '/(admin)/secciones': typeof adminSeccionesRoute
   '/(admin)/servicios': typeof adminServiciosRoute
   '/(admin)/sucursales': typeof adminSucursalesRoute
   '/(admin)/tipos-atributo': typeof adminTiposAtributoRoute
+  '/(admin)/tipos-seccion': typeof adminTiposSeccionRoute
   '/(admin)/usuarios': typeof adminUsuariosRoute
 }
 export interface FileRouteTypes {
@@ -213,9 +231,11 @@ export interface FileRouteTypes {
     | '/registros'
     | '/roles'
     | '/roles-auditoria'
+    | '/secciones'
     | '/servicios'
     | '/sucursales'
     | '/tipos-atributo'
+    | '/tipos-seccion'
     | '/usuarios'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -234,9 +254,11 @@ export interface FileRouteTypes {
     | '/registros'
     | '/roles'
     | '/roles-auditoria'
+    | '/secciones'
     | '/servicios'
     | '/sucursales'
     | '/tipos-atributo'
+    | '/tipos-seccion'
     | '/usuarios'
   id:
     | '__root__'
@@ -256,9 +278,11 @@ export interface FileRouteTypes {
     | '/(admin)/registros'
     | '/(admin)/roles'
     | '/(admin)/roles-auditoria'
+    | '/(admin)/secciones'
     | '/(admin)/servicios'
     | '/(admin)/sucursales'
     | '/(admin)/tipos-atributo'
+    | '/(admin)/tipos-seccion'
     | '/(admin)/usuarios'
   fileRoutesById: FileRoutesById
 }
@@ -279,9 +303,11 @@ export interface RootRouteChildren {
   adminRegistrosRoute: typeof adminRegistrosRoute
   adminRolesRoute: typeof adminRolesRoute
   adminRolesAuditoriaRoute: typeof adminRolesAuditoriaRoute
+  adminSeccionesRoute: typeof adminSeccionesRoute
   adminServiciosRoute: typeof adminServiciosRoute
   adminSucursalesRoute: typeof adminSucursalesRoute
   adminTiposAtributoRoute: typeof adminTiposAtributoRoute
+  adminTiposSeccionRoute: typeof adminTiposSeccionRoute
   adminUsuariosRoute: typeof adminUsuariosRoute
 }
 
@@ -308,6 +334,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof adminUsuariosRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/(admin)/tipos-seccion': {
+      id: '/(admin)/tipos-seccion'
+      path: '/tipos-seccion'
+      fullPath: '/tipos-seccion'
+      preLoaderRoute: typeof adminTiposSeccionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/(admin)/tipos-atributo': {
       id: '/(admin)/tipos-atributo'
       path: '/tipos-atributo'
@@ -327,6 +360,13 @@ declare module '@tanstack/react-router' {
       path: '/servicios'
       fullPath: '/servicios'
       preLoaderRoute: typeof adminServiciosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(admin)/secciones': {
+      id: '/(admin)/secciones'
+      path: '/secciones'
+      fullPath: '/secciones'
+      preLoaderRoute: typeof adminSeccionesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/(admin)/roles-auditoria': {
@@ -447,9 +487,11 @@ const rootRouteChildren: RootRouteChildren = {
   adminRegistrosRoute: adminRegistrosRoute,
   adminRolesRoute: adminRolesRoute,
   adminRolesAuditoriaRoute: adminRolesAuditoriaRoute,
+  adminSeccionesRoute: adminSeccionesRoute,
   adminServiciosRoute: adminServiciosRoute,
   adminSucursalesRoute: adminSucursalesRoute,
   adminTiposAtributoRoute: adminTiposAtributoRoute,
+  adminTiposSeccionRoute: adminTiposSeccionRoute,
   adminUsuariosRoute: adminUsuariosRoute,
 }
 export const routeTree = rootRouteImport

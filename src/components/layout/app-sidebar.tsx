@@ -68,6 +68,7 @@ const navMain = [
     items: [
       { title: 'Registros (About)', url: '/registros' },
       { title: 'Menús', url: '/menus' },
+      { title: "Tipos de Sección", url: "/tipos-seccion" }, 
       { title: 'Secciones (Heroes, etc.)', url: '/secciones' },
       { title: 'Footers', url: '/footers' },
       { title: 'Wizard', url: '/pasos-wizard' },
