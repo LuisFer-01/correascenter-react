@@ -20,6 +20,7 @@ import { Route as adminRolesRouteImport } from './routes/(admin)/roles'
 import { Route as adminRegistrosRouteImport } from './routes/(admin)/registros'
 import { Route as adminProductosRouteImport } from './routes/(admin)/productos'
 import { Route as adminPasosWizardRouteImport } from './routes/(admin)/pasos-wizard'
+import { Route as adminMenusRouteImport } from './routes/(admin)/menus'
 import { Route as adminMarcasRouteImport } from './routes/(admin)/marcas'
 import { Route as adminIndustriasRouteImport } from './routes/(admin)/industrias'
 import { Route as adminEmpresasRouteImport } from './routes/(admin)/empresas'
@@ -83,6 +84,11 @@ const adminPasosWizardRoute = adminPasosWizardRouteImport.update({
   path: '/pasos-wizard',
   getParentRoute: () => rootRouteImport,
 } as any)
+const adminMenusRoute = adminMenusRouteImport.update({
+  id: '/(admin)/menus',
+  path: '/menus',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const adminMarcasRoute = adminMarcasRouteImport.update({
   id: '/(admin)/marcas',
   path: '/marcas',
@@ -127,6 +133,7 @@ export interface FileRoutesByFullPath {
   '/empresas': typeof adminEmpresasRoute
   '/industrias': typeof adminIndustriasRoute
   '/marcas': typeof adminMarcasRoute
+  '/menus': typeof adminMenusRoute
   '/pasos-wizard': typeof adminPasosWizardRoute
   '/productos': typeof adminProductosRoute
   '/registros': typeof adminRegistrosRoute
@@ -146,6 +153,7 @@ export interface FileRoutesByTo {
   '/empresas': typeof adminEmpresasRoute
   '/industrias': typeof adminIndustriasRoute
   '/marcas': typeof adminMarcasRoute
+  '/menus': typeof adminMenusRoute
   '/pasos-wizard': typeof adminPasosWizardRoute
   '/productos': typeof adminProductosRoute
   '/registros': typeof adminRegistrosRoute
@@ -167,6 +175,7 @@ export interface FileRoutesById {
   '/(admin)/empresas': typeof adminEmpresasRoute
   '/(admin)/industrias': typeof adminIndustriasRoute
   '/(admin)/marcas': typeof adminMarcasRoute
+  '/(admin)/menus': typeof adminMenusRoute
   '/(admin)/pasos-wizard': typeof adminPasosWizardRoute
   '/(admin)/productos': typeof adminProductosRoute
   '/(admin)/registros': typeof adminRegistrosRoute
@@ -188,6 +197,7 @@ export interface FileRouteTypes {
     | '/empresas'
     | '/industrias'
     | '/marcas'
+    | '/menus'
     | '/pasos-wizard'
     | '/productos'
     | '/registros'
@@ -207,6 +217,7 @@ export interface FileRouteTypes {
     | '/empresas'
     | '/industrias'
     | '/marcas'
+    | '/menus'
     | '/pasos-wizard'
     | '/productos'
     | '/registros'
@@ -227,6 +238,7 @@ export interface FileRouteTypes {
     | '/(admin)/empresas'
     | '/(admin)/industrias'
     | '/(admin)/marcas'
+    | '/(admin)/menus'
     | '/(admin)/pasos-wizard'
     | '/(admin)/productos'
     | '/(admin)/registros'
@@ -248,6 +260,7 @@ export interface RootRouteChildren {
   adminEmpresasRoute: typeof adminEmpresasRoute
   adminIndustriasRoute: typeof adminIndustriasRoute
   adminMarcasRoute: typeof adminMarcasRoute
+  adminMenusRoute: typeof adminMenusRoute
   adminPasosWizardRoute: typeof adminPasosWizardRoute
   adminProductosRoute: typeof adminProductosRoute
   adminRegistrosRoute: typeof adminRegistrosRoute
@@ -338,6 +351,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof adminPasosWizardRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/(admin)/menus': {
+      id: '/(admin)/menus'
+      path: '/menus'
+      fullPath: '/menus'
+      preLoaderRoute: typeof adminMenusRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/(admin)/marcas': {
       id: '/(admin)/marcas'
       path: '/marcas'
@@ -400,6 +420,7 @@ const rootRouteChildren: RootRouteChildren = {
   adminEmpresasRoute: adminEmpresasRoute,
   adminIndustriasRoute: adminIndustriasRoute,
   adminMarcasRoute: adminMarcasRoute,
+  adminMenusRoute: adminMenusRoute,
   adminPasosWizardRoute: adminPasosWizardRoute,
   adminProductosRoute: adminProductosRoute,
   adminRegistrosRoute: adminRegistrosRoute,
