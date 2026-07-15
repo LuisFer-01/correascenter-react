@@ -18,6 +18,11 @@ export interface AtributoTecnico {
     permite_valor_numerico: boolean
     permite_unidad_medida: boolean
   }
+  categorias?: {
+    id: number
+    nombre: string
+    slug: string
+  }[]
 }
 
 export interface CreateAtributoDTO {
@@ -28,6 +33,7 @@ export interface CreateAtributoDTO {
   unidad_medida?: string
   orden?: number
   estado?: 'activo' | 'inactivo'
+  categoria_ids?: number[]
 }
 
 export interface UpdateAtributoDTO {
@@ -39,6 +45,7 @@ export interface UpdateAtributoDTO {
   unidad_medida?: string
   orden?: number
   estado?: 'activo' | 'inactivo' | 'eliminado'
+  categoria_ids?: number[]
 }
 
 export interface CategoriaAtributo {

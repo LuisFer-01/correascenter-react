@@ -13,6 +13,14 @@ export async function getAtributos(includeDeleted: boolean = false): Promise<Atr
         permite_descripcion,
         permite_valor_numerico,
         permite_unidad_medida
+      ),
+      categoria_atributo (
+        categoria_id,
+        categorias (
+          id,
+          nombre,
+          slug
+        )
       )
     `)
 
@@ -28,6 +36,7 @@ export async function getAtributos(includeDeleted: boolean = false): Promise<Atr
   return (data || []).map((a: any) => ({
     ...a,
     estado: a.estado || 'activo',
+    categorias: a.categoria_atributo?.map((ca: any) => ca.categorias).filter(Boolean) || [],
   }))
 }
 
@@ -35,6 +44,17 @@ export async function getTiposAtributoActivos() {
   const { data, error } = await supabase
     .from('tipo_atributo')
     .select('id, nombre, slug, permite_descripcion, permite_valor_numerico, permite_unidad_medida')
+    .eq('estado', 'activo')
+    .order('nombre', { ascending: true })
+
+  if (error) throw error
+  return data || []
+}
+
+export async function getCategoriasActivas() {
+  const { data, error } = await supabase
+    .from('categorias')
+    .select('id, nombre, slug')
     .eq('estado', 'activo')
     .order('nombre', { ascending: true })
 
@@ -54,7 +74,7 @@ export async function getNextOrdenAtributo(): Promise<number> {
   return (data.orden || 0) + 1
 }
 
-export async function crearAtributo(dto: CreateAtributoDTO) {
+export async function crearAtributo(dto: CreateAtributoDTO & { categoria_ids?: number[] }) {
   // Obtener el tipo de atributo para validar campos permitidos
   const { data: tipoAtributo, error: tipoError } = await supabase
     .from('tipo_atributo')
@@ -93,17 +113,34 @@ export async function crearAtributo(dto: CreateAtributoDTO) {
     insertData.unidad_medida = null
   }
 
-  const { data, error } = await supabaseAdmin
+  const { data: atributoData, error: atributoError } = await supabaseAdmin
     .from('atributos_tecnico')
     .insert(insertData)
     .select()
     .single()
 
-  if (error) throw new Error(error.message)
-  return data
+  if (atributoError) throw new Error(atributoError.message)
+
+  // Asignar a categorías si se proporcionaron
+  if (dto.categoria_ids && dto.categoria_ids.length > 0) {
+    const asignaciones = dto.categoria_ids.map((categoriaId) => ({
+      categoria_id: categoriaId,
+      atributo_id: atributoData.id,
+      orden: 0,
+      estado: 'activo',
+    }))
+
+    const { error: asignacionError } = await supabaseAdmin
+      .from('categoria_atributo')
+      .insert(asignaciones)
+
+    if (asignacionError) throw new Error(asignacionError.message)
+  }
+
+  return atributoData
 }
 
-export async function actualizarAtributo(dto: UpdateAtributoDTO) {
+export async function actualizarAtributo(dto: UpdateAtributoDTO & { categoria_ids?: number[] }) {
   // Obtener el tipo de atributo
   const { data: tipoAtributo, error: tipoError } = await supabase
     .from('tipo_atributo')
@@ -151,15 +188,43 @@ export async function actualizarAtributo(dto: UpdateAtributoDTO) {
     }
   }
 
-  const { data, error } = await supabaseAdmin
+  const { data: atributoData, error: atributoError } = await supabaseAdmin
     .from('atributos_tecnico')
     .update(updateData)
     .eq('id', dto.id)
     .select()
     .single()
 
-  if (error) throw new Error(error.message)
-  return data
+  if (atributoError) throw new Error(atributoError.message)
+
+  // Actualizar asignaciones a categorías
+  if (dto.categoria_ids !== undefined) {
+    // Borrar asignaciones antiguas
+    const { error: deleteError } = await supabaseAdmin
+      .from('categoria_atributo')
+      .delete()
+      .eq('atributo_id', dto.id)
+
+    if (deleteError) throw new Error(deleteError.message)
+
+    // Insertar nuevas asignaciones
+    if (dto.categoria_ids.length > 0) {
+      const asignaciones = dto.categoria_ids.map((categoriaId) => ({
+        categoria_id: categoriaId,
+        atributo_id: dto.id,
+        orden: 0,
+        estado: 'activo',
+      }))
+
+      const { error: insertError } = await supabaseAdmin
+        .from('categoria_atributo')
+        .insert(asignaciones)
+
+      if (insertError) throw new Error(insertError.message)
+    }
+  }
+
+  return atributoData
 }
 
 export async function eliminarAtributo(id: number) {
@@ -179,4 +244,38 @@ export async function restaurarAtributo(id: number) {
     .eq('id', id)
 
   if (error) throw new Error(error.message)
+}
+
+export async function getAtributoById(id: number): Promise<AtributoTecnico | null> {
+  const { data, error } = await supabase
+    .from('atributos_tecnico')
+    .select(`
+      *,
+      tipo_atributo:tipo_atributo (
+        id,
+        nombre,
+        slug,
+        permite_descripcion,
+        permite_valor_numerico,
+        permite_unidad_medida
+      ),
+      categoria_atributo (
+        categoria_id,
+        categorias (
+          id,
+          nombre,
+          slug
+        )
+      )
+    `)
+    .eq('id', id)
+    .single()
+
+  if (error || !data) return null
+
+  return {
+    ...data,
+    estado: data.estado || 'activo',
+    categorias: data.categoria_atributo?.map((ca: any) => ca.categorias).filter(Boolean) || [],
+  }
 }

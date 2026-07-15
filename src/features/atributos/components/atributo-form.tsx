@@ -1,4 +1,5 @@
 import { FormShell } from '@/components/shared/form-shell'
+import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -9,10 +10,11 @@ import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import {
-    actualizarAtributo,
-    crearAtributo,
-    getNextOrdenAtributo,
-    getTiposAtributoActivos,
+  actualizarAtributo,
+  crearAtributo,
+  getCategoriasActivas,
+  getNextOrdenAtributo,
+  getTiposAtributoActivos,
 } from '../services/atributo.service'
 
 const formSchema = z.object({
@@ -23,6 +25,7 @@ const formSchema = z.object({
   unidad_medida: z.string().optional(),
   orden: z.coerce.number().default(0),
   estado: z.enum(['activo', 'inactivo']),
+  categoria_ids: z.array(z.number()).default([]),
 })
 
 type FormValues = z.infer<typeof formSchema>
@@ -43,6 +46,8 @@ export function AtributoForm({
   const [isLoading, setIsLoading] = useState(false)
   const [tipos, setTipos] = useState<any[]>([])
   const [tiposLoaded, setTiposLoaded] = useState(false)
+  const [categorias, setCategorias] = useState<{ id: number; nombre: string; slug: string }[]>([])
+  const [categoriasLoaded, setCategoriasLoaded] = useState(false)
   const [tipoSeleccionado, setTipoSeleccionado] = useState<any>(null)
   const isEditing = !!atributoEditar
 
@@ -56,6 +61,7 @@ export function AtributoForm({
       unidad_medida: '',
       orden: 0,
       estado: 'activo',
+      categoria_ids: [],
     },
   })
 
@@ -68,6 +74,16 @@ export function AtributoForm({
       })
     }
   }, [open, tiposLoaded])
+
+  // Cargar categorías
+  useEffect(() => {
+    if (open && !categoriasLoaded) {
+      getCategoriasActivas().then((data) => {
+        setCategorias(data)
+        setCategoriasLoaded(true)
+      })
+    }
+  }, [open, categoriasLoaded])
 
   // Actualizar tipo seleccionado cuando cambia
   const tipoIdWatch = form.watch('tipo_atributo_id')
@@ -91,6 +107,7 @@ export function AtributoForm({
         unidad_medida: '',
         orden: 0,
         estado: 'activo',
+        categoria_ids: [],
       })
       setTipoSeleccionado(null)
       return
@@ -105,6 +122,7 @@ export function AtributoForm({
         unidad_medida: atributoEditar.unidad_medida || '',
         orden: atributoEditar.orden,
         estado: atributoEditar.estado === 'eliminado' ? 'activo' : atributoEditar.estado,
+        categoria_ids: atributoEditar.categorias?.map((c) => c.id) || [],
       })
       const tipo = tipos.find((t) => t.id === atributoEditar.tipo_atributo_id)
       setTipoSeleccionado(tipo || null)
@@ -118,6 +136,7 @@ export function AtributoForm({
           unidad_medida: '',
           orden: nextOrden,
           estado: 'activo',
+          categoria_ids: [],
         })
         setTipoSeleccionado(tipos[0] || null)
       })
@@ -190,7 +209,7 @@ export function AtributoForm({
           )}
           {tipoSeleccionado && (
             <p className="text-xs text-muted-foreground">
-              Este tipo permite: 
+              Este tipo permite:
               {tipoSeleccionado.permite_descripcion && ' Descripción'}
               {tipoSeleccionado.permite_valor_numerico && ' Valor numérico'}
               {tipoSeleccionado.permite_unidad_medida && ' Unidad de medida'}
@@ -239,6 +258,38 @@ export function AtributoForm({
             )}
           </div>
         )}
+
+        {/* Asignación a Categorías */}
+        <div className="grid gap-2 border-t pt-4">
+          <Label>Asignar a Categorías</Label>
+          <div className="space-y-2 border rounded-md p-3 bg-muted/20 max-h-48 overflow-y-auto">
+            {categorias.map((categoria) => (
+              <div key={categoria.id} className="flex items-center space-x-2">
+                <Checkbox
+                  id={`categoria-${categoria.id}`}
+                  checked={form.watch('categoria_ids').includes(categoria.id)}
+                  onCheckedChange={(checked) => {
+                    const current = form.getValues('categoria_ids')
+                    if (checked) {
+                      form.setValue('categoria_ids', [...current, categoria.id])
+                    } else {
+                      form.setValue('categoria_ids', current.filter((id) => id !== categoria.id))
+                    }
+                  }}
+                />
+                <Label htmlFor={`categoria-${categoria.id}`} className="text-sm font-normal cursor-pointer flex-1">
+                  {categoria.nombre}
+                </Label>
+              </div>
+            ))}
+            {categorias.length === 0 && (
+              <p className="text-sm text-muted-foreground">No hay categorías activas disponibles.</p>
+            )}
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Selecciona las categorías a las que se asignará este atributo.
+          </p>
+        </div>
 
         {/* Orden y Estado */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t">

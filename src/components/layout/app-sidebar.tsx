@@ -58,7 +58,7 @@ const navMain = [
     title: 'Aplicaciones',
     icon: Building2,
     items: [
-      { title: 'Industrias', url: '/industrias' },
+      { title: "Industrias", url: "/industrias" },
       { title: 'Servicios', url: '/servicios' },
     ],
   },

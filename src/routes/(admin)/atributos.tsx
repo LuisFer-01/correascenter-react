@@ -134,6 +134,23 @@ function AtributosPage() {
       ),
     },
     {
+      id: 'categorias',
+      header: 'Categorías',
+      cell: ({ row }) => (
+        <div className="flex flex-wrap gap-1 max-w-xs">
+          {row.original.categorias && row.original.categorias.length > 0 ? (
+            row.original.categorias.map((categoria) => (
+              <Badge key={categoria.id} variant="secondary" className="text-xs">
+                {categoria.nombre}
+              </Badge>
+            ))
+          ) : (
+            <span className="text-sm text-muted-foreground">Sin asignar</span>
+          )}
+        </div>
+      ),
+    },
+    {
       accessorKey: 'valor_numerico',
       header: 'Valor',
       cell: ({ row }) => {

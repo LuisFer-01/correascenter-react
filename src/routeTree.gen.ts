@@ -20,6 +20,7 @@ import { Route as adminRegistrosRouteImport } from './routes/(admin)/registros'
 import { Route as adminProductosRouteImport } from './routes/(admin)/productos'
 import { Route as adminPasosWizardRouteImport } from './routes/(admin)/pasos-wizard'
 import { Route as adminMarcasRouteImport } from './routes/(admin)/marcas'
+import { Route as adminIndustriasRouteImport } from './routes/(admin)/industrias'
 import { Route as adminEmpresasRouteImport } from './routes/(admin)/empresas'
 import { Route as adminDashboardRouteImport } from './routes/(admin)/dashboard'
 import { Route as adminCategoriasRouteImport } from './routes/(admin)/categorias'
@@ -81,6 +82,11 @@ const adminMarcasRoute = adminMarcasRouteImport.update({
   path: '/marcas',
   getParentRoute: () => rootRouteImport,
 } as any)
+const adminIndustriasRoute = adminIndustriasRouteImport.update({
+  id: '/(admin)/industrias',
+  path: '/industrias',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const adminEmpresasRoute = adminEmpresasRouteImport.update({
   id: '/(admin)/empresas',
   path: '/empresas',
@@ -113,6 +119,7 @@ export interface FileRoutesByFullPath {
   '/categorias': typeof adminCategoriasRoute
   '/dashboard': typeof adminDashboardRoute
   '/empresas': typeof adminEmpresasRoute
+  '/industrias': typeof adminIndustriasRoute
   '/marcas': typeof adminMarcasRoute
   '/pasos-wizard': typeof adminPasosWizardRoute
   '/productos': typeof adminProductosRoute
@@ -130,6 +137,7 @@ export interface FileRoutesByTo {
   '/categorias': typeof adminCategoriasRoute
   '/dashboard': typeof adminDashboardRoute
   '/empresas': typeof adminEmpresasRoute
+  '/industrias': typeof adminIndustriasRoute
   '/marcas': typeof adminMarcasRoute
   '/pasos-wizard': typeof adminPasosWizardRoute
   '/productos': typeof adminProductosRoute
@@ -149,6 +157,7 @@ export interface FileRoutesById {
   '/(admin)/categorias': typeof adminCategoriasRoute
   '/(admin)/dashboard': typeof adminDashboardRoute
   '/(admin)/empresas': typeof adminEmpresasRoute
+  '/(admin)/industrias': typeof adminIndustriasRoute
   '/(admin)/marcas': typeof adminMarcasRoute
   '/(admin)/pasos-wizard': typeof adminPasosWizardRoute
   '/(admin)/productos': typeof adminProductosRoute
@@ -168,6 +177,7 @@ export interface FileRouteTypes {
     | '/categorias'
     | '/dashboard'
     | '/empresas'
+    | '/industrias'
     | '/marcas'
     | '/pasos-wizard'
     | '/productos'
@@ -185,6 +195,7 @@ export interface FileRouteTypes {
     | '/categorias'
     | '/dashboard'
     | '/empresas'
+    | '/industrias'
     | '/marcas'
     | '/pasos-wizard'
     | '/productos'
@@ -203,6 +214,7 @@ export interface FileRouteTypes {
     | '/(admin)/categorias'
     | '/(admin)/dashboard'
     | '/(admin)/empresas'
+    | '/(admin)/industrias'
     | '/(admin)/marcas'
     | '/(admin)/pasos-wizard'
     | '/(admin)/productos'
@@ -222,6 +234,7 @@ export interface RootRouteChildren {
   adminCategoriasRoute: typeof adminCategoriasRoute
   adminDashboardRoute: typeof adminDashboardRoute
   adminEmpresasRoute: typeof adminEmpresasRoute
+  adminIndustriasRoute: typeof adminIndustriasRoute
   adminMarcasRoute: typeof adminMarcasRoute
   adminPasosWizardRoute: typeof adminPasosWizardRoute
   adminProductosRoute: typeof adminProductosRoute
@@ -312,6 +325,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof adminMarcasRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/(admin)/industrias': {
+      id: '/(admin)/industrias'
+      path: '/industrias'
+      fullPath: '/industrias'
+      preLoaderRoute: typeof adminIndustriasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/(admin)/empresas': {
       id: '/(admin)/empresas'
       path: '/empresas'
@@ -358,6 +378,7 @@ const rootRouteChildren: RootRouteChildren = {
   adminCategoriasRoute: adminCategoriasRoute,
   adminDashboardRoute: adminDashboardRoute,
   adminEmpresasRoute: adminEmpresasRoute,
+  adminIndustriasRoute: adminIndustriasRoute,
   adminMarcasRoute: adminMarcasRoute,
   adminPasosWizardRoute: adminPasosWizardRoute,
   adminProductosRoute: adminProductosRoute,
